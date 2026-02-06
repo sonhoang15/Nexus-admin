@@ -1,33 +1,35 @@
 import { StockBadge } from "@/components/system/products/StockBadge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Product } from "@/types";
+import { TProduct } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Eye, Pencil, Trash2, Star } from "lucide-react";
 import { cn } from "@/libs/utils";
+
 type Props = {
-  product: Product;
-  onView: (product: Product) => void;
-  onEdit: (product: Product) => void;
-  onDelete: (product: Product) => void;
+  product: TProduct;
+  onView: (product: TProduct) => void;
+  onEdit: (product: TProduct) => void;
+  onDelete: (product: TProduct) => void;
 };
 
 export function ProductCard({ product, onView, onEdit, onDelete }: Props) {
   return (
-    <Card className="overflow-hidden relative">
-      <div className="relative aspect-video bg-muted">
+    <Card className="relative overflow-hidden group transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.15)]">
+      <div className="relative aspect-video bg-muted overflow-hidden">
         {product.images[0] ? (
           <img
             src={product.images[0]}
             alt={product.name}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover transition-transform duration-300 ease-out group-hover:scale-105"
           />
         ) : (
           <div className="flex items-center justify-center text-foreground/50">
             No Image
           </div>
         )}
+
         {product.isFeatured && (
-          <div className="absolute top-2 left-2 p-1.5 rounded-full bg-primary text-primary-foreground">
+          <div className="absolute top-2 left-2 p-1.5 rounded-full bg-primary text-primary-foreground z-10">
             <Star className="h-3 w-3" />
           </div>
         )}
@@ -76,13 +78,28 @@ export function ProductCard({ product, onView, onEdit, onDelete }: Props) {
         </div>
 
         <div className="flex justify-end gap-2 mt-4 pt-4 border-t">
-          <Button variant="ghost" size="icon" onClick={() => onView(product)}>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => onView(product)}
+            className="hover:bg-blue-700 text-blue-500"
+          >
             <Eye className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" onClick={() => onEdit(product)}>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => onEdit(product)}
+            className="hover:bg-yellow-700 text-yellow-500"
+          >
             <Pencil className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" onClick={() => onDelete(product)}>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => onDelete(product)}
+            className="hover:bg-red-700 text-red-500"
+          >
             <Trash2 className="h-4 w-4" />
           </Button>
         </div>

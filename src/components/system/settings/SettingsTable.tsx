@@ -10,7 +10,7 @@ interface Props {
 
 export function SettingsTable({ settings, onEdit, onDelete }: Props) {
   return (
-    <div className="bg-card rounded-lg border overflow-x-auto">
+    <div className="bg-card rounded-lg border overflow-x-auto shadow-md shadow-black/10">
       <table className="w-full">
         <thead>
           <tr className="border-b text-left">
@@ -31,13 +31,19 @@ export function SettingsTable({ settings, onEdit, onDelete }: Props) {
               <td className="p-4 text-muted-foreground">{s.description}</td>
               <td className="p-4">
                 <div className="flex justify-end gap-2">
-                  <Button variant="ghost" size="icon" onClick={() => onEdit(s)}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => onEdit(s)}
+                    className=" text-blue-500 hover:bg-blue-600"
+                  >
                     <Pencil className="h-4 w-4" />
                   </Button>
                   <Button
                     variant="ghost"
                     size="icon"
                     onClick={() => onDelete(s.id)}
+                    className=" text-red-500 hover:bg-red-600"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>

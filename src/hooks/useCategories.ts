@@ -1,12 +1,18 @@
 import { useState } from "react";
 import { mockCategories } from "@/data/mockData";
-import { Category } from "@/types";
+import { TCategory } from "@/types";
+
+type ViewMode = "table" | "form";
 
 export const useCategories = () => {
-  const [categories, setCategories] = useState<Category[]>(mockCategories);
+  const [categories, setCategories] = useState<TCategory[]>(mockCategories);
   const [search, setSearch] = useState("");
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [viewMode, setViewMode] = useState<ViewMode>("table");
+
+  const [editingCategory, setEditingCategory] = useState<TCategory | null>(
+    null,
+  );
+
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -15,20 +21,18 @@ export const useCategories = () => {
   const filteredCategories = categories.filter((category) =>
     category.name.toLowerCase().includes(search.toLowerCase()),
   );
-
   const handleAdd = () => {
     setEditingCategory(null);
     setFormData({ name: "", description: "" });
-    setDialogOpen(true);
+    setViewMode("form");
   };
-
-  const handleEdit = (category: Category) => {
+  const handleEdit = (category: TCategory) => {
     setEditingCategory(category);
     setFormData({
       name: category.name,
       description: category.description || "",
     });
-    setDialogOpen(true);
+    setViewMode("form");
   };
 
   const handleDelete = (id: string) => {
@@ -43,7 +47,7 @@ export const useCategories = () => {
         ),
       );
     } else {
-      const newCategory: Category = {
+      const newCategory: TCategory = {
         id: Date.now().toString(),
         ...formData,
         productCount: 0,
@@ -51,23 +55,32 @@ export const useCategories = () => {
       };
       setCategories([...categories, newCategory]);
     }
-    setDialogOpen(false);
+
+    setEditingCategory(null);
+    setFormData({ name: "", description: "" });
+    setViewMode("table");
+  };
+
+  const handleCancel = () => {
+    setEditingCategory(null);
+    setFormData({ name: "", description: "" });
+    setViewMode("table");
   };
 
   return {
     categories: filteredCategories,
     search,
-    dialogOpen,
+    viewMode,
     editingCategory,
     formData,
 
     setSearch,
-    setDialogOpen,
     setFormData,
 
     handleAdd,
     handleEdit,
     handleDelete,
     handleSubmit,
+    handleCancel,
   };
 };

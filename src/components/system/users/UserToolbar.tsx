@@ -20,7 +20,10 @@ export function UserToolbar({ search, onSearchChange, onAdd }: Props) {
         />
       </div>
 
-      <Button onClick={onAdd}>
+      <Button
+        onClick={onAdd}
+        className="bg-green-500 text-white hover:bg-green-600"
+      >
         <UserPlus className="h-4 w-4 mr-2" />
         Add User
       </Button>

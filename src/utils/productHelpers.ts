@@ -1,6 +1,6 @@
-import { Product } from "@/types";
+import { TProduct } from "@/types";
 
-export function getStockStatus(product: Product) {
+export function getStockStatus(product: TProduct) {
   if (product.stockUnits <= (product.lowStockAlert || 10)) {
     return { label: "LOW STOCK", variant: "destructive" as const };
   }

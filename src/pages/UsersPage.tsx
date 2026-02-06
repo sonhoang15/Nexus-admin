@@ -1,93 +1,56 @@
-import { useState } from "react";
-import { mockUsers } from "@/data/mockData";
-import { User } from "@/types";
-
 import { UserHeader } from "@/components/system/users/UserHeader";
 import { UserToolbar } from "@/components/system/users/UserToolbar";
 import { UserTable } from "@/components/system/users/UserTable";
-import { UserDialog } from "@/components/system/users/UserDialog";
+import { UserForm } from "@/components/system/users/UserForm";
+import { useUsers } from "@/hooks/useUsers";
 
 export default function UsersPage() {
-  const [users, setUsers] = useState<User[]>(mockUsers);
-  const [search, setSearch] = useState("");
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingUser, setEditingUser] = useState<User | null>(null);
-  const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    password: "",
-    role: "ADMIN" as "ADMIN" | "SUPER_ADMIN",
-    status: "ACTIVE" as "ACTIVE" | "INACTIVE",
-  });
+  const {
+    users,
+    search,
+    viewMode,
+    editingUser,
+    formData,
 
-  const filteredUsers = users.filter(
-    (u) =>
-      u.fullName.toLowerCase().includes(search.toLowerCase()) ||
-      u.email.toLowerCase().includes(search.toLowerCase()),
-  );
+    setSearch,
+    setFormData,
 
-  const handleSubmit = () => {
-    if (editingUser) {
-      setUsers((prev) =>
-        prev.map((u) => (u.id === editingUser.id ? { ...u, ...formData } : u)),
-      );
-    } else {
-      setUsers((prev) => [
-        ...prev,
-        {
-          id: Date.now().toString(),
-          ...formData,
-          createdAt: new Date().toISOString().split("T")[0],
-        },
-      ]);
-    }
-    setDialogOpen(false);
-  };
+    handleAdd,
+    handleEdit,
+    handleDelete,
+    handleSubmit,
+    handleCancel,
+  } = useUsers();
 
   return (
     <div className="space-y-6">
       <UserHeader />
 
-      <UserToolbar
-        search={search}
-        onSearchChange={setSearch}
-        onAdd={() => {
-          setEditingUser(null);
-          setFormData({
-            fullName: "",
-            email: "",
-            password: "",
-            role: "ADMIN",
-            status: "ACTIVE",
-          });
-          setDialogOpen(true);
-        }}
-      />
+      {viewMode === "list" && (
+        <>
+          <UserToolbar
+            search={search}
+            onSearchChange={setSearch}
+            onAdd={handleAdd}
+          />
 
-      <UserTable
-        users={filteredUsers}
-        onEdit={(u) => {
-          setEditingUser(u);
-          setFormData({
-            fullName: u.fullName,
-            email: u.email,
-            password: "",
-            role: u.role,
-            status: u.status,
-          });
-          setDialogOpen(true);
-        }}
-        onDelete={(id) => setUsers((prev) => prev.filter((u) => u.id !== id))}
-      />
+          <UserTable
+            users={users}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
+        </>
+      )}
 
-      <UserDialog
-        open={dialogOpen}
-        editingUser={editingUser}
-        formData={formData}
-        onOpenChange={setDialogOpen}
-        onChange={setFormData}
-        onSubmit={handleSubmit}
-      />
+      {viewMode === "form" && (
+        <UserForm
+          editingUser={editingUser}
+          formData={formData}
+          onChange={setFormData}
+          onSubmit={handleSubmit}
+          onCancel={handleCancel}
+        />
+      )}
     </div>
   );
 }

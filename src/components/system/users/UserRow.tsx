@@ -1,4 +1,4 @@
-import { User } from "@/types";
+import { TUser } from "@/types";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -6,8 +6,8 @@ import { Pencil, Trash2 } from "lucide-react";
 import { cn } from "@/libs/utils";
 
 type Props = {
-  user: User;
-  onEdit: (user: User) => void;
+  user: TUser;
+  onEdit: (user: TUser) => void;
   onDelete: (id: string) => void;
 };
 
@@ -60,7 +60,12 @@ export function UserRow({ user, onEdit, onDelete }: Props) {
 
       <td className="p-4">
         <div className="flex justify-end gap-2">
-          <Button variant="ghost" size="icon" onClick={() => onEdit(user)}>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => onEdit(user)}
+            className=" text-yellow-500 hover:bg-yellow-600"
+          >
             <Pencil className="h-4 w-4" />
           </Button>
 
@@ -69,6 +74,7 @@ export function UserRow({ user, onEdit, onDelete }: Props) {
               variant="ghost"
               size="icon"
               onClick={() => onDelete(user.id)}
+              className="text-red-500 hover:bg-red-600"
             >
               <Trash2 className="h-4 w-4" />
             </Button>

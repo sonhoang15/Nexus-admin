@@ -1,10 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import { Users, FileText, File } from "lucide-react";
-import { StatsCard } from "@/components/dashboard/StatsCard";
-import { PlatformGrowthChart } from "@/components/dashboard/PlatformGrowthChart";
-import { CategorySplitChart } from "@/components/dashboard/CategorySplitChart";
-import { LatestProducts } from "@/components/dashboard/LatestProducts";
-import { ContentStatus } from "@/components/dashboard/ContentStatus";
+import { StatsCard } from "@/components/system/dashboard/StatsCard";
+import { PlatformGrowthChart } from "@/components/system/dashboard/PlatformGrowthChart";
+import { CategorySplitChart } from "@/components/system/dashboard/CategorySplitChart";
+import { LatestProducts } from "@/components/system/dashboard/LatestProducts";
+import { ContentStatus } from "@/components/system/dashboard/ContentStatus";
 import {
   mockProducts,
   mockPages,

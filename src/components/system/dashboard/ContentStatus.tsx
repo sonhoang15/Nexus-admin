@@ -1,11 +1,17 @@
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Plus, FileText } from 'lucide-react';
-import { Page } from '@/types';
-import { Badge } from '@/components/ui/badge';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Plus, FileText } from "lucide-react";
+import { TPage } from "@/types";
+import { Badge } from "@/components/ui/badge";
 
 interface ContentStatusProps {
-  pages: Page[];
+  pages: TPage[];
   onNewPage: () => void;
 }
 
@@ -15,9 +21,15 @@ export function ContentStatus({ pages, onNewPage }: ContentStatusProps) {
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
           <CardTitle>Content Status</CardTitle>
-          <CardDescription>Recently modified CMS pages and drafts.</CardDescription>
+          <CardDescription>
+            Recently modified CMS pages and drafts.
+          </CardDescription>
         </div>
-        <Button size="sm" onClick={onNewPage}>
+        <Button
+          size="sm"
+          onClick={onNewPage}
+          className="bg-yellow-500 text-white hover:bg-yellow-600"
+        >
           <Plus className="h-4 w-4 mr-1" />
           NEW PAGE
         </Button>
@@ -36,11 +48,11 @@ export function ContentStatus({ pages, onNewPage }: ContentStatusProps) {
                 </p>
               </div>
               <Badge
-                variant={page.status === 'PUBLISHED' ? 'default' : 'secondary'}
+                variant={page.status === "PUBLISHED" ? "default" : "secondary"}
                 className={
-                  page.status === 'PUBLISHED'
-                    ? 'bg-success text-success-foreground hover:bg-success/90'
-                    : ''
+                  page.status === "PUBLISHED"
+                    ? "bg-success text-success-foreground hover:bg-success/90"
+                    : ""
                 }
               >
                 {page.status}

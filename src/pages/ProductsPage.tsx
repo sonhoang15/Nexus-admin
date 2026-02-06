@@ -2,33 +2,31 @@ import { useState } from "react";
 import { useProducts } from "@/hooks/useProducts";
 import { ProductToolbar } from "@/components/system/products/ProductToolbar";
 import { ProductCard } from "@/components/system/products/ProductCard";
-import { ProductFormDialog } from "@/components/system/products/ProductFormDialog";
+import { ProductForm } from "@/components/system/products/ProductForm";
 import { ProductViewDialog } from "@/components/system/products/ProductViewDialog";
-import { TProductFilters } from "@/types/product";
 import { ProductFilters } from "@/components/system/products/ProductFilter";
+import { TProductFilters } from "@/types/product";
 import { EStatus, EPromotion, ESort } from "@/enums/filters.enum";
 
 const ProductsPage = () => {
   const {
     products,
     search,
-    dialogOpen,
-    viewDialogOpen,
+    viewMode,
     selectedProduct,
     editingProduct,
     formData,
     setSearch,
-    setDialogOpen,
-    setViewDialogOpen,
     setFormData,
     handleAdd,
     handleEdit,
     handleView,
     handleDelete,
     handleSubmit,
+    handleCancel,
   } = useProducts();
 
-  const [showFilters, setShowFilters] = useState<boolean>(false);
+  const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState<TProductFilters>({
     categories: [],
     status: EStatus.ALL_STATUS,
@@ -47,37 +45,37 @@ const ProductsPage = () => {
         showFilters={showFilters}
         onToggleFilters={() => setShowFilters((v) => !v)}
       />
-      {showFilters && (
-        <div className="mt-6">
-          <ProductFilters value={filters} onChange={setFilters} />
+
+      {showFilters && <ProductFilters value={filters} onChange={setFilters} />}
+
+      {viewMode === "table" && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {products.map((product) => (
+            <ProductCard
+              key={product.id}
+              product={product}
+              onView={handleView}
+              onEdit={handleEdit}
+              onDelete={(p) => handleDelete(p.id)}
+            />
+          ))}
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {products.map((product) => (
-          <ProductCard
-            key={product.id}
-            product={product}
-            onView={handleView}
-            onEdit={handleEdit}
-            onDelete={(p) => handleDelete(p.id)}
-          />
-        ))}
-      </div>
-
-      <ProductFormDialog
-        open={dialogOpen}
-        editing={!!editingProduct}
-        formData={formData}
-        setFormData={setFormData}
-        onClose={() => setDialogOpen(false)}
-        onSubmit={handleSubmit}
-      />
+      {viewMode === "form" && (
+        <ProductForm
+          editing={!!editingProduct}
+          formData={formData}
+          setFormData={setFormData}
+          onSubmit={handleSubmit}
+          onClose={handleCancel}
+        />
+      )}
 
       <ProductViewDialog
-        open={viewDialogOpen}
+        open={viewMode === "view"}
         product={selectedProduct}
-        onClose={() => setViewDialogOpen(false)}
+        onClose={handleCancel}
       />
     </div>
   );

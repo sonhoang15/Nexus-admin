@@ -91,8 +91,8 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                     className={cn(
                       "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
                       isActive
-                        ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                        : "text-sidebar-foreground hover:bg-sidebar-accent/50",
+                        ? "bg-muted text-foreground"
+                        : "text-muted-foreground hover:bg-muted/70 hover:text-foreground",
                     )}
                   >
                     <item.icon className="h-5 w-5 shrink-0" />
@@ -120,7 +120,10 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                className="flex items-center gap-2 bg-gray-200 hover:bg-black text-black"
+              >
                 <span className="text-sm font-medium hidden sm:block">
                   Super Admin
                 </span>
@@ -132,9 +135,13 @@ export function AdminLayout({ children }: AdminLayoutProps) {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>Profile</DropdownMenuItem>
-              <DropdownMenuItem>Settings</DropdownMenuItem>
-              <DropdownMenuItem className="text-destructive">
+              <DropdownMenuItem className="hover:!bg-black text-black">
+                Profile
+              </DropdownMenuItem>
+              <DropdownMenuItem className="hover:!bg-black text-black">
+                Settings
+              </DropdownMenuItem>
+              <DropdownMenuItem className="text-destructive hover:!bg-red-500 text-red-500">
                 Logout
               </DropdownMenuItem>
             </DropdownMenuContent>

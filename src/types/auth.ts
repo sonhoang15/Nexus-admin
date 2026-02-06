@@ -1,8 +1,8 @@
-export interface LoginDto {
+export interface TLoginDto {
   email: string;
   password: string;
 }
 
-export interface RefreshTokenDto {
+export interface TRefreshTokenDto {
   refreshToken: string;
 }

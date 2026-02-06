@@ -5,10 +5,10 @@ import { SearchInput } from "@/components/common/SearchInput";
 interface Props {
   search: string;
   onSearchChange: (value: string) => void;
-  onAdd: () => void;
+  handleAdd: () => void;
 }
 
-export function CategoryToolbar({ search, onSearchChange, onAdd }: Props) {
+export function ContentToolbar({ search, onSearchChange, handleAdd }: Props) {
   return (
     <div className="flex flex-col sm:flex-row gap-4 justify-between">
       <div className="relative max-w-md flex-1">
@@ -21,11 +21,11 @@ export function CategoryToolbar({ search, onSearchChange, onAdd }: Props) {
       </div>
 
       <Button
-        onClick={onAdd}
+        onClick={handleAdd}
         className="shadow-md shadow-black/10 bg-lime-500 hover:bg-lime-700"
       >
         <Plus className="h-4 w-4 mr-2" />
-        Add Category
+        Create Page
       </Button>
     </div>
   );

@@ -17,7 +17,10 @@ export function SettingsSearchBar({ search, onSearchChange, onAdd }: Props) {
         placeholder="Search keys or descriptions..."
         className="max-w-md flex-1"
       />
-      <Button onClick={onAdd}>
+      <Button
+        onClick={onAdd}
+        className="bg-green-500 text-white hover:bg-green-600"
+      >
         <Plus className="h-4 w-4 mr-2" />
         Add Setting
       </Button>

@@ -1,15 +1,18 @@
 import { useState } from "react";
-import { Product } from "@/types";
+import { TProduct } from "@/types";
 import { mockProducts, mockCategories } from "@/data/mockData";
 import { DEFAULT_PRODUCT_FORM } from "@/constants/productDefaults";
 
+type ViewMode = "table" | "form" | "view";
+
 export function useProducts() {
-  const [products, setProducts] = useState<Product[]>(mockProducts);
-  const [search, setSearch] = useState<string>("");
-  const [dialogOpen, setDialogOpen] = useState<boolean>(false);
-  const [viewDialogOpen, setViewDialogOpen] = useState<boolean>(false);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [products, setProducts] = useState<TProduct[]>(mockProducts);
+  const [search, setSearch] = useState("");
+  const [viewMode, setViewMode] = useState<ViewMode>("table");
+
+  const [selectedProduct, setSelectedProduct] = useState<TProduct | null>(null);
+  const [editingProduct, setEditingProduct] = useState<TProduct | null>(null);
+
   const [formData, setFormData] =
     useState<typeof DEFAULT_PRODUCT_FORM>(DEFAULT_PRODUCT_FORM);
 
@@ -22,10 +25,10 @@ export function useProducts() {
   const handleAdd = () => {
     setEditingProduct(null);
     setFormData(DEFAULT_PRODUCT_FORM);
-    setDialogOpen(true);
+    setViewMode("form");
   };
 
-  const handleEdit = (product: Product) => {
+  const handleEdit = (product: TProduct) => {
     setEditingProduct(product);
     setFormData({
       sku: product.sku,
@@ -47,12 +50,12 @@ export function useProducts() {
       metaTitle: product.metaTitle || "",
       metaDescription: product.metaDescription || "",
     });
-    setDialogOpen(true);
+    setViewMode("form");
   };
 
-  const handleView = (product: Product) => {
+  const handleView = (product: TProduct) => {
     setSelectedProduct(product);
-    setViewDialogOpen(true);
+    setViewMode("view");
   };
 
   const handleDelete = (id: string) => {
@@ -89,25 +92,34 @@ export function useProducts() {
       ]);
     }
 
-    setDialogOpen(false);
+    setEditingProduct(null);
+    setFormData(DEFAULT_PRODUCT_FORM);
+    setViewMode("table");
+  };
+
+  const handleCancel = () => {
+    setEditingProduct(null);
+    setSelectedProduct(null);
+    setFormData(DEFAULT_PRODUCT_FORM);
+    setViewMode("table");
   };
 
   return {
     products: filteredProducts,
     search,
-    dialogOpen,
-    viewDialogOpen,
+    viewMode,
     selectedProduct,
     editingProduct,
     formData,
+
     setSearch,
-    setDialogOpen,
-    setViewDialogOpen,
     setFormData,
+
     handleAdd,
     handleEdit,
     handleView,
     handleDelete,
     handleSubmit,
+    handleCancel,
   };
 }

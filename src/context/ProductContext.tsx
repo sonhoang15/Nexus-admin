@@ -1,9 +1,9 @@
 import { createContext, useContext } from "react";
-import { Product } from "../types";
+import { TProduct } from "../types";
 
 interface ProductsContextValue {
-  onEdit: (product: Product) => void;
-  onView: (product: Product) => void;
+  onEdit: (product: TProduct) => void;
+  onView: (product: TProduct) => void;
   onDelete: (id: string | number) => void;
 }
 

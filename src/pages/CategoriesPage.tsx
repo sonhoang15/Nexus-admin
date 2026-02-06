@@ -1,46 +1,56 @@
 import { useCategories } from "@/hooks/useCategories";
 import { CategoryToolbar } from "@/components/system/categories/CategoryToolbar";
 import { CategoryTable } from "@/components/system/categories/CategoryTable";
-import { CategoryFormDialog } from "@/components/system/categories/CategoryFormDialog";
+import { CategoryForm } from "@/components/system/categories/CategoryForm";
+import { CategoryHeader } from "@/components/system/categories/CategoryHeader";
 
 const CategoriesPage = () => {
   const {
     categories,
     search,
-    dialogOpen,
+    viewMode,
     editingCategory,
     formData,
+
     setSearch,
-    setDialogOpen,
     setFormData,
+
     handleAdd,
     handleEdit,
     handleDelete,
     handleSubmit,
+    handleCancel,
   } = useCategories();
 
   return (
     <div className="space-y-6">
-      <CategoryToolbar
-        search={search}
-        onSearchChange={setSearch}
-        onAdd={handleAdd}
-      />
+      <CategoryHeader />
 
-      <CategoryTable
-        categories={categories}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-      />
+      {viewMode === "table" && (
+        <>
+          <CategoryToolbar
+            search={search}
+            onSearchChange={setSearch}
+            onAdd={handleAdd}
+          />
 
-      <CategoryFormDialog
-        open={dialogOpen}
-        editingCategory={editingCategory}
-        formData={formData}
-        onChange={setFormData}
-        onClose={() => setDialogOpen(false)}
-        onSubmit={handleSubmit}
-      />
+          <CategoryTable
+            categories={categories}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
+        </>
+      )}
+
+      {viewMode === "form" && (
+        <CategoryForm
+          editingCategory={editingCategory}
+          formData={formData}
+          onChange={setFormData}
+          onClose={handleCancel}
+          onSubmit={handleSubmit}
+        />
+      )}
     </div>
   );
 };

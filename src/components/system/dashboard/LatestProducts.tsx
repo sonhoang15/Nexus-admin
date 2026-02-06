@@ -7,11 +7,11 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal, ArrowRight } from "lucide-react";
-import { Product } from "@/types";
+import { TProduct } from "@/types";
 import { cn } from "@/libs/utils";
 
 interface LatestProductsProps {
-  products: Product[];
+  products: TProduct[];
   onViewAll: () => void;
 }
 
@@ -25,7 +25,7 @@ export function LatestProducts({ products, onViewAll }: LatestProductsProps) {
             New additions to the hardware inventory.
           </CardDescription>
         </div>
-        <Button variant="ghost" size="icon">
+        <Button variant="ghost" size="icon" className="hover:bg-black">
           <MoreHorizontal className="h-4 w-4" />
         </Button>
       </CardHeader>

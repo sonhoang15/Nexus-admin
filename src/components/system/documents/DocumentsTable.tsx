@@ -21,7 +21,7 @@ const getFileIcon = (fileType: string) => {
 
 export function DocumentsTable({ documents, onDelete }: Props) {
   return (
-    <div className="bg-card rounded-lg border overflow-x-auto">
+    <div className="bg-card rounded-lg border overflow-x-auto shadow-md shadow-black/10">
       <table className="w-full">
         <thead>
           <tr className="border-b text-left">
@@ -55,20 +55,33 @@ export function DocumentsTable({ documents, onDelete }: Props) {
               <td className="p-4 text-muted-foreground">{doc.updatedAt}</td>
               <td className="p-4">
                 <div className="flex justify-end gap-2">
-                  <Button variant="ghost" size="icon">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="hover:bg-blue-700 text-blue-500"
+                  >
                     <Eye className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="icon">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="hover:bg-yellow-700 text-yellow-500"
+                  >
                     <Pencil className="h-4 w-4" />
                   </Button>
                   <Button
                     variant="ghost"
                     size="icon"
                     onClick={() => onDelete(doc.id)}
+                    className="hover:bg-red-700 text-red-500"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="icon">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="hover:bg-green-700 text-green-500"
+                  >
                     <Download className="h-4 w-4" />
                   </Button>
                 </div>

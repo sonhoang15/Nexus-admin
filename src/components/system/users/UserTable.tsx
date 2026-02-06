@@ -1,15 +1,15 @@
-import { User } from "@/types";
+import { TUser } from "@/types";
 import { UserRow } from "./UserRow";
 
 type Props = {
-  users: User[];
-  onEdit: (user: User) => void;
+  users: TUser[];
+  onEdit: (user: TUser) => void;
   onDelete: (id: string) => void;
 };
 
 export function UserTable({ users, onEdit, onDelete }: Props) {
   return (
-    <div className="bg-card rounded-lg border">
+    <div className="bg-card rounded-lg border shadow-md shadow-black/10">
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>

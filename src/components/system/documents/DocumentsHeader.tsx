@@ -17,7 +17,10 @@ export function DocumentsHeader({ onUpload }: Props) {
 
       <div className="flex justify-between items-center">
         <h2 className="text-lg font-semibold">Recent Documents</h2>
-        <Button onClick={onUpload}>
+        <Button
+          onClick={onUpload}
+          className="bg-blue-500 text-white hover:bg-blue-700"
+        >
           <Upload className="h-4 w-4 mr-2" />
           Upload New
         </Button>

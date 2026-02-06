@@ -1,16 +1,16 @@
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2, Layers } from "lucide-react";
-import { Category } from "@/types";
+import { TCategory } from "@/types";
 
 interface Props {
-  categories: Category[];
-  onEdit: (category: Category) => void;
+  categories: TCategory[];
+  onEdit: (category: TCategory) => void;
   onDelete: (id: string) => void;
 }
 
 export function CategoryTable({ categories, onEdit, onDelete }: Props) {
   return (
-    <div className="bg-card rounded-lg border">
+    <div className="bg-card rounded-lg border shadow-md shadow-black/10">
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
@@ -54,6 +54,7 @@ export function CategoryTable({ categories, onEdit, onDelete }: Props) {
                       variant="ghost"
                       size="icon"
                       onClick={() => onEdit(category)}
+                      className=" text-yellow-500 hover:bg-yellow-500"
                     >
                       <Pencil className="h-4 w-4" />
                     </Button>
@@ -61,6 +62,7 @@ export function CategoryTable({ categories, onEdit, onDelete }: Props) {
                       variant="ghost"
                       size="icon"
                       onClick={() => onDelete(category.id)}
+                      className="text-red-500 hover:bg-red-500"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
