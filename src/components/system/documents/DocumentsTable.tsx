@@ -1,9 +1,9 @@
-import { TDocument } from "@/types";
+import { IDocument } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Eye, Pencil, Trash2, Download, File, FileText } from "lucide-react";
 
-interface Props {
-  documents: TDocument[];
+interface IDocumentsTableProps {
+  documents: IDocument[];
   onDelete: (id: string) => void;
 }
 
@@ -19,7 +19,7 @@ const getFileIcon = (fileType: string) => {
   }
 };
 
-export function DocumentsTable({ documents, onDelete }: Props) {
+export function DocumentsTable({ documents, onDelete }: IDocumentsTableProps) {
   return (
     <div className="bg-card rounded-lg border overflow-x-auto shadow-md shadow-black/10">
       <table className="w-full">

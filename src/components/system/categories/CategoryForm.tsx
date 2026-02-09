@@ -2,10 +2,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { TCategory } from "@/types";
+import { ICategory } from "@/types";
 
-interface Props {
-  editingCategory: TCategory | null;
+interface IProps {
+  editingCategory: ICategory | null;
   formData: {
     name: string;
     description: string;
@@ -21,7 +21,7 @@ export function CategoryForm({
   onChange,
   onClose,
   onSubmit,
-}: Props) {
+}: IProps) {
   return (
     <div className="bg-white rounded-2xl shadow-md p-6">
       <div className="flex items-center justify-between mb-6">

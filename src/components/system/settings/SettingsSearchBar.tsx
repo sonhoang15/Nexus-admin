@@ -2,13 +2,17 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { SearchInput } from "@/components/common/SearchInput";
 
-interface Props {
+interface ISettingsSearchBarProps {
   search: string;
   onSearchChange: (v: string) => void;
   onAdd: () => void;
 }
 
-export function SettingsSearchBar({ search, onSearchChange, onAdd }: Props) {
+export function SettingsSearchBar({
+  search,
+  onSearchChange,
+  onAdd,
+}: ISettingsSearchBarProps) {
   return (
     <div className="flex flex-col sm:flex-row gap-4 justify-between">
       <SearchInput

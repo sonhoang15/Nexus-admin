@@ -1,19 +1,19 @@
 import { createContext, useContext } from "react";
-import { TProduct } from "../types";
+import { IProduct } from "../types";
 
-interface ProductsContextValue {
-  onEdit: (product: TProduct) => void;
-  onView: (product: TProduct) => void;
+interface IProductsContextValue {
+  onEdit: (product: IProduct) => void;
+  onView: (product: IProduct) => void;
   onDelete: (id: string | number) => void;
 }
 
-const ProductsContext = createContext<ProductsContextValue | null>(null);
+const ProductsContext = createContext<IProductsContextValue | null>(null);
 
 export const ProductsProvider = ({
   value,
   children,
 }: {
-  value: ProductsContextValue;
+  value: IProductsContextValue;
   children: React.ReactNode;
 }) => {
   return (

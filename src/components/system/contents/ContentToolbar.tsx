@@ -2,13 +2,17 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { SearchInput } from "@/components/common/SearchInput";
 
-interface Props {
+interface IContentToolbarProps {
   search: string;
   onSearchChange: (value: string) => void;
   handleAdd: () => void;
 }
 
-export function ContentToolbar({ search, onSearchChange, handleAdd }: Props) {
+export function ContentToolbar({
+  search,
+  onSearchChange,
+  handleAdd,
+}: IContentToolbarProps) {
   return (
     <div className="flex flex-col sm:flex-row gap-4 justify-between">
       <div className="relative max-w-md flex-1">

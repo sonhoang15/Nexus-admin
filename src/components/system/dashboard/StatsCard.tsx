@@ -2,7 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/libs/utils";
 import { LucideIcon } from "lucide-react";
 
-interface StatsCardProps {
+interface IStatsCardProps {
   title: string;
   value: string | number;
   icon: LucideIcon;
@@ -19,7 +19,7 @@ export function StatsCard({
   icon: Icon,
   change,
   className,
-}: StatsCardProps) {
+}: IStatsCardProps) {
   return (
     <Card className={cn("", className)}>
       <CardContent className="p-6">

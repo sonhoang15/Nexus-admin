@@ -6,7 +6,7 @@ import { ProductForm } from "@/components/system/products/ProductForm";
 import { ProductViewDialog } from "@/components/system/products/ProductViewDialog";
 import { ProductFilters } from "@/components/system/products/ProductFilter";
 import { TProductFilters } from "@/types/product";
-import { EStatus, EPromotion, ESort } from "@/enums/filters.enum";
+import { EStatus, EPromotion, ESort } from "@/enums/filters.enums";
 
 const ProductsPage = () => {
   const {

@@ -2,13 +2,17 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { SearchInput } from "@/components/common/SearchInput";
 
-interface Props {
+interface ICategoryToolbarProps {
   search: string;
   onSearchChange: (value: string) => void;
   onAdd: () => void;
 }
 
-export function CategoryToolbar({ search, onSearchChange, onAdd }: Props) {
+export function CategoryToolbar({
+  search,
+  onSearchChange,
+  onAdd,
+}: ICategoryToolbarProps) {
   return (
     <div className="flex flex-col sm:flex-row gap-4 justify-between">
       <div className="relative max-w-md flex-1">

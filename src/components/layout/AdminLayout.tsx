@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { cn } from "@/libs/utils";
 import {
@@ -10,6 +10,7 @@ import {
   FileCode,
   Settings,
   Menu,
+  LogOut,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -19,6 +20,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Outlet } from "react-router-dom";
+import { UserContext } from "@/context/UserContext";
+import { logoutApi } from "@/services/AuthService";
 
 const navigation = [
   { name: "Overview", href: "/", icon: LayoutDashboard },
@@ -30,11 +34,15 @@ const navigation = [
   { name: "Settings", href: "/settings", icon: Settings },
 ];
 
-interface AdminLayoutProps {
-  children: React.ReactNode;
-}
+export const useUser = () => {
+  const context = useContext(UserContext);
+  if (!context) {
+    throw new Error("useUser must be used within UserProvider");
+  }
+  return context;
+};
 
-export function AdminLayout({ children }: AdminLayoutProps) {
+export function AdminLayout() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
@@ -134,21 +142,35 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="end" className="w-48">
+              <h1 className="text-sm font-medium text-black uppercase text-center">
+                Account
+              </h1>
+              <h1 className="text-xs text-muted-foreground text-center">
+                {useUser().auth?.user.email || "N/A"}
+              </h1>
               <DropdownMenuItem className="hover:!bg-black text-black">
+                <Users className="h-4 w-4 mr-2" />
                 Profile
               </DropdownMenuItem>
               <DropdownMenuItem className="hover:!bg-black text-black">
+                <Settings className="h-4 w-4 mr-2" />
                 Settings
               </DropdownMenuItem>
-              <DropdownMenuItem className="text-destructive hover:!bg-red-500 text-red-500">
+              <DropdownMenuItem
+                className="text-destructive hover:!bg-red-500 text-red-500"
+                onClick={() => logoutApi()}
+              >
+                <LogOut className="h-4 w-4 mr-2" />
                 Logout
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </header>
 
-        <main className="flex-1 overflow-y-auto p-4 lg:p-6">{children}</main>
+        <main className="flex-1 overflow-y-auto p-4 lg:p-6">
+          <Outlet />
+        </main>
       </div>
     </div>
   );

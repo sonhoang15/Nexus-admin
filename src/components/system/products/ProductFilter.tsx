@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/popover";
 import { ChevronDown } from "lucide-react";
 import { TProductFilters } from "@/types/product";
-import { EStatus, EPromotion, ESort } from "@/enums/filters.enum";
+import { EStatus, EPromotion, ESort } from "@/enums/filters.enums";
 
 const CATEGORY_OPTIONS = [
   "Electronics",

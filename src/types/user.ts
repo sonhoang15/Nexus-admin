@@ -1,7 +1,7 @@
 export type TUserRole = "ADMIN" | "SUPER_ADMIN";
 export type TUserStatus = "ACTIVE" | "INACTIVE";
 
-export interface TUser {
+export interface IUser {
   id: string;
   fullName: string;
   email: string;
@@ -10,7 +10,7 @@ export interface TUser {
   createdAt: string;
 }
 
-export interface TCreateUserDto {
+export interface ICreateUserDto {
   fullName: string;
   email: string;
   password: string;
@@ -18,7 +18,7 @@ export interface TCreateUserDto {
   status?: TUserStatus;
 }
 
-export interface TUpdateUserDto {
+export interface IUpdateUserDto {
   fullName?: string;
   email?: string;
   password?: string;
