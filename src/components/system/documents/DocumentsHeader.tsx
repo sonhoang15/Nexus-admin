@@ -1,11 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 
-interface Props {
+interface IDocumentsHeaderProps {
   onUpload: () => void;
 }
 
-export function DocumentsHeader({ onUpload }: Props) {
+export function DocumentsHeader({ onUpload }: IDocumentsHeaderProps) {
   return (
     <>
       <div>

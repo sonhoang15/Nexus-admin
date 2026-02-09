@@ -1,6 +1,6 @@
 export type TPageStatus = "PUBLISHED" | "DRAFT";
 
-export interface TPage {
+export interface IPage {
   id: string;
   title: string;
   slug: string;
@@ -11,7 +11,7 @@ export interface TPage {
   updatedAt: string;
 }
 
-export interface TCreatePageDto {
+export interface ICreatePageDto {
   title: string;
   slug?: string;
   content?: string;
@@ -19,7 +19,7 @@ export interface TCreatePageDto {
   featuredImage?: File;
 }
 
-export interface TUpdatePageDto {
+export interface IUpdatePageDto {
   title?: string;
   slug?: string;
   content?: string;

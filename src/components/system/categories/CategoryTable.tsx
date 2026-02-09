@@ -1,14 +1,18 @@
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2, Layers } from "lucide-react";
-import { TCategory } from "@/types";
+import { ICategory } from "@/types";
 
-interface Props {
-  categories: TCategory[];
-  onEdit: (category: TCategory) => void;
+interface ICategoryTableProps {
+  categories: ICategory[];
+  onEdit: (category: ICategory) => void;
   onDelete: (id: string) => void;
 }
 
-export function CategoryTable({ categories, onEdit, onDelete }: Props) {
+export function CategoryTable({
+  categories,
+  onEdit,
+  onDelete,
+}: ICategoryTableProps) {
   return (
     <div className="bg-card rounded-lg border shadow-md shadow-black/10">
       <div className="overflow-x-auto">

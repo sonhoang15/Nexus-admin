@@ -1,4 +1,4 @@
-export interface TDocument {
+export interface IDocument {
   id: string;
   title: string;
   fileName: string;
@@ -9,7 +9,7 @@ export interface TDocument {
   updatedAt: string;
 }
 
-export interface TCreateDocumentDto {
+export interface ICreateDocumentDto {
   file: File;
   title?: string;
 }

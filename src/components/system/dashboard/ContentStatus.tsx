@@ -7,15 +7,15 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, FileText } from "lucide-react";
-import { TPage } from "@/types";
+import { IPage } from "@/types";
 import { Badge } from "@/components/ui/badge";
 
-interface ContentStatusProps {
-  pages: TPage[];
+interface IContentStatusProps {
+  pages: IPage[];
   onNewPage: () => void;
 }
 
-export function ContentStatus({ pages, onNewPage }: ContentStatusProps) {
+export function ContentStatus({ pages, onNewPage }: IContentStatusProps) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">

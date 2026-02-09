@@ -1,4 +1,4 @@
-import { EStatus, EPromotion, ESort } from "@/enums/filters.enum";
+import { EStatus, EPromotion, ESort } from "@/enums/filters.enums";
 
 export type TProductFilters = {
   categories: string[];
@@ -9,7 +9,7 @@ export type TProductFilters = {
   sort: ESort;
 };
 
-export interface TProduct {
+export interface IProduct {
   id: string;
   sku: string;
   barcode?: string;
@@ -34,7 +34,7 @@ export interface TProduct {
   createdAt: string;
 }
 
-export interface TCreateProductDto {
+export interface ICreateProductDto {
   sku: string;
   barcode?: string;
   name: string;
@@ -56,7 +56,7 @@ export interface TCreateProductDto {
   images: File[];
 }
 
-export interface TUpdateProductDto {
+export interface IUpdateProductDto {
   sku?: string;
   barcode?: string;
   name?: string;

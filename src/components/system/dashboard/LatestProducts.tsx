@@ -7,15 +7,15 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal, ArrowRight } from "lucide-react";
-import { TProduct } from "@/types";
+import { IProduct } from "@/types";
 import { cn } from "@/libs/utils";
 
-interface LatestProductsProps {
-  products: TProduct[];
+interface ILatestProductsProps {
+  products: IProduct[];
   onViewAll: () => void;
 }
 
-export function LatestProducts({ products, onViewAll }: LatestProductsProps) {
+export function LatestProducts({ products, onViewAll }: ILatestProductsProps) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">

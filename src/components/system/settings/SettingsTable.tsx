@@ -1,14 +1,18 @@
-import { TSetting } from "@/types";
+import { ISetting } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2, Terminal } from "lucide-react";
 
-interface Props {
-  settings: TSetting[];
-  onEdit: (setting: TSetting) => void;
+interface ISettingsTableProps {
+  settings: ISetting[];
+  onEdit: (setting: ISetting) => void;
   onDelete: (id: string) => void;
 }
 
-export function SettingsTable({ settings, onEdit, onDelete }: Props) {
+export function SettingsTable({
+  settings,
+  onEdit,
+  onDelete,
+}: ISettingsTableProps) {
   return (
     <div className="bg-card rounded-lg border overflow-x-auto shadow-md shadow-black/10">
       <table className="w-full">

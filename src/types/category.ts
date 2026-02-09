@@ -1,4 +1,4 @@
-export interface TCategory {
+export interface ICategory {
   id: string;
   name: string;
   description?: string;
@@ -6,12 +6,12 @@ export interface TCategory {
   createdAt: string;
 }
 
-export interface TCreateCategoryDto {
+export interface ICreateCategoryDto {
   name: string;
   description?: string;
 }
 
-export interface TUpdateCategoryDto {
+export interface IUpdateCategoryDto {
   name?: string;
   description?: string;
 }

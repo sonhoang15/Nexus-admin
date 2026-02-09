@@ -3,7 +3,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Upload, Info } from "lucide-react";
 
-interface Props {
+interface IUploadDocumentFormProps {
   formData: {
     title: string;
     file: File | null;
@@ -18,7 +18,7 @@ export function UploadDocumentForm({
   onChange,
   onClose,
   onSubmit,
-}: Props) {
+}: IUploadDocumentFormProps) {
   if (!open) return null;
 
   return (

@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
-import { TSetting } from "@/types";
+import { ISetting } from "@/types";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Info, Terminal } from "lucide-react";
 
-interface Props {
-  setting: TSetting | null;
+interface ISettingsFormProps {
+  setting: ISetting | null;
   onCancel: () => void;
   onSubmit: (payload: {
     configKey: string;
@@ -16,7 +16,11 @@ interface Props {
   }) => void;
 }
 
-export function SettingsForm({ setting, onCancel, onSubmit }: Props) {
+export function SettingsForm({
+  setting,
+  onCancel,
+  onSubmit,
+}: ISettingsFormProps) {
   const [formData, setFormData] = useState({
     configKey: "",
     description: "",
