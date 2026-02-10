@@ -1,8 +1,10 @@
-import { useCategories } from "@/hooks/useCategories";
-import { CategoryToolbar } from "@/components/system/categories/CategoryToolbar";
-import { CategoryTable } from "@/components/system/categories/CategoryTable";
+import { PageHeader } from "@/components/common/PageHeader";
+import { ListToolbar } from "@/components/common/ListToolbar";
+import { DataTable } from "@/components/common/DataTable";
 import { CategoryForm } from "@/components/system/categories/CategoryForm";
-import { CategoryHeader } from "@/components/system/categories/CategoryHeader";
+import { categoryColumns } from "@/components/system/categories/category.columns";
+import { useCategories } from "@/hooks/useCategories";
+import { ConfirmDeleteModal } from "@/components/common/ConfirmDeleteModal";
 
 const CategoriesPage = () => {
   const {
@@ -11,6 +13,8 @@ const CategoriesPage = () => {
     viewMode,
     editingCategory,
     formData,
+    deleteCategoryId,
+    isDeleting,
 
     setSearch,
     setFormData,
@@ -20,24 +24,32 @@ const CategoriesPage = () => {
     handleDelete,
     handleSubmit,
     handleCancel,
+
+    confirmDelete,
+    cancelDelete,
   } = useCategories();
 
   return (
     <div className="space-y-6">
-      <CategoryHeader />
-
+      <PageHeader
+        title="Category Management"
+        description="System management and detailed overview."
+      />
       {viewMode === "table" && (
         <>
-          <CategoryToolbar
+          <ListToolbar
             search={search}
+            Action="Add Category"
             onSearchChange={setSearch}
             onAdd={handleAdd}
           />
 
-          <CategoryTable
-            categories={categories}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
+          <DataTable
+            data={categories}
+            columns={categoryColumns({
+              onEdit: handleEdit,
+              onDelete: handleDelete,
+            })}
           />
         </>
       )}
@@ -51,6 +63,12 @@ const CategoriesPage = () => {
           onSubmit={handleSubmit}
         />
       )}
+      <ConfirmDeleteModal
+        open={!!deleteCategoryId}
+        loading={isDeleting}
+        onConfirm={confirmDelete}
+        onCancel={cancelDelete}
+      />
     </div>
   );
 };

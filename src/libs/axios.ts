@@ -15,10 +15,15 @@ const instance = axios.create({
 
 instance.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    const authStr = localStorage.getItem("auth");
+
+    if (authStr) {
+      const auth = JSON.parse(authStr);
+      if (auth?.accessToken) {
+        config.headers.Authorization = `Bearer ${auth.accessToken}`;
+      }
     }
+
     return config;
   },
   (error) => Promise.reject(error),

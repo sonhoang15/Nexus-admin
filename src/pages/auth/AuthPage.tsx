@@ -1,21 +1,11 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import clsx from "clsx";
 import SignInForm from "@/components/auth/Login";
 import SignUpForm from "@/components/auth/Register";
-// import { UserContext } from "@/context/UserContext";
-import { Navigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 export default function AuthForm() {
   const [isRegister, setIsRegister] = useState<boolean>(false);
-
-  // const { user } = useContext(UserContext)!;
-
-  // if (user.isLoading) return null;
-
-  // if (user.isAuthenticated) {
-  //     return <Navigate to="/home" replace />;
-  // }
-
   return (
     <div className="w-full min-h-screen flex items-center justify-center bg-[#f6f5f7]">
       <div
@@ -67,12 +57,12 @@ export default function AuthForm() {
               <p className="mb-6">
                 To keep connected with us please login with your info
               </p>
-              <button
+              <Button
                 onClick={() => setIsRegister(false)}
                 className="ghost border-2 border-white text-white px-6 py-2 rounded-[20px] uppercase font-bold hover:bg-white hover:text-[#6200ea] transition"
               >
                 Sign In
-              </button>
+              </Button>
             </div>
 
             <div
@@ -88,12 +78,12 @@ export default function AuthForm() {
               <p className="mb-6">
                 Enter your details and start your journey with us
               </p>
-              <button
+              <Button
                 onClick={() => setIsRegister(true)}
                 className="ghost border-2 border-white text-white px-6 py-2 rounded-[20px] uppercase font-bold hover:bg-white hover:text-[#6200ea] transition"
               >
                 Sign Up
-              </button>
+              </Button>
             </div>
           </div>
         </div>

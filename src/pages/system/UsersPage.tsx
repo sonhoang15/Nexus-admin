@@ -1,8 +1,10 @@
-import { UserHeader } from "@/components/system/users/UserHeader";
-import { UserToolbar } from "@/components/system/users/UserToolbar";
-import { UserTable } from "@/components/system/users/UserTable";
+import { PageHeader } from "@/components/common/PageHeader";
+import { ListToolbar } from "@/components/common/ListToolbar";
+import { userColumns } from "@/components/system/users/UsersColumns";
 import { UserForm } from "@/components/system/users/UserForm";
 import { useUsers } from "@/hooks/useUsers";
+import { ConfirmDeleteModal } from "@/components/common/ConfirmDeleteModal";
+import { DataTable } from "@/components/common/DataTable";
 
 export default function UsersPage() {
   const {
@@ -11,6 +13,8 @@ export default function UsersPage() {
     viewMode,
     editingUser,
     formData,
+    deleteUserId,
+    isDeleting,
 
     setSearch,
     setFormData,
@@ -20,24 +24,33 @@ export default function UsersPage() {
     handleDelete,
     handleSubmit,
     handleCancel,
+
+    confirmDelete,
+    cancelDelete,
   } = useUsers();
 
   return (
     <div className="space-y-6">
-      <UserHeader />
+      <PageHeader
+        title="User Management"
+        description="System management and detailed overview."
+      />
 
       {viewMode === "list" && (
         <>
-          <UserToolbar
+          <ListToolbar
             search={search}
+            Action="Add User"
             onSearchChange={setSearch}
             onAdd={handleAdd}
           />
 
-          <UserTable
-            users={users}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
+          <DataTable
+            data={users}
+            columns={userColumns({
+              onEdit: handleEdit,
+              onDelete: handleDelete,
+            })}
           />
         </>
       )}
@@ -51,6 +64,12 @@ export default function UsersPage() {
           onCancel={handleCancel}
         />
       )}
+      <ConfirmDeleteModal
+        open={!!deleteUserId}
+        loading={isDeleting}
+        onConfirm={confirmDelete}
+        onCancel={cancelDelete}
+      />
     </div>
   );
 }
