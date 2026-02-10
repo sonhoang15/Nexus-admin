@@ -22,7 +22,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Outlet } from "react-router-dom";
 import { UserContext } from "@/context/UserContext";
-import { logoutApi } from "@/services/AuthService";
 
 const navigation = [
   { name: "Overview", href: "/", icon: LayoutDashboard },
@@ -46,6 +45,7 @@ export function AdminLayout() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const { auth, logoutContext } = useUser();
 
   return (
     <div className="min-h-screen flex w-full">
@@ -147,9 +147,12 @@ export function AdminLayout() {
                 Account
               </h1>
               <h1 className="text-xs text-muted-foreground text-center">
-                {useUser().auth?.user.email || "N/A"}
+                {auth?.user.email || "N/A"}
               </h1>
-              <DropdownMenuItem className="hover:!bg-black text-black">
+              <DropdownMenuItem
+                className="hover:!bg-black text-black"
+                // onClick={() => Navigate("/profile")}
+              >
                 <Users className="h-4 w-4 mr-2" />
                 Profile
               </DropdownMenuItem>
@@ -159,7 +162,7 @@ export function AdminLayout() {
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="text-destructive hover:!bg-red-500 text-red-500"
-                onClick={() => logoutApi()}
+                onClick={() => logoutContext()}
               >
                 <LogOut className="h-4 w-4 mr-2" />
                 Logout

@@ -1,7 +1,8 @@
 import { createContext, useEffect, useState } from "react";
-import { loginApi } from "@/services/AuthService";
+import { loginService } from "@/services/AuthService";
 import { storage } from "@/utils/storageHelper";
 import { IAuthData, TLoginResponse } from "@/types/auth";
+import { logoutService } from "@/services/AuthService";
 
 interface LoginResult {
   message: string;
@@ -12,7 +13,7 @@ export interface UserContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   loginContext: (email: string, password: string) => Promise<LoginResult>;
-  logout: () => void;
+  logoutContext: () => void;
 }
 
 const AUTH_STORAGE_KEY = "auth";
@@ -37,7 +38,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     email: string,
     password: string,
   ): Promise<LoginResult> => {
-    const res: TLoginResponse = await loginApi({ email, password });
+    const res: TLoginResponse = await loginService({ email, password });
 
     const authData = res.data;
 
@@ -49,9 +50,15 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     };
   };
 
-  const logout = () => {
-    storage.remove(AUTH_STORAGE_KEY);
-    setAuth(null);
+  const logoutContext = async () => {
+    try {
+      await logoutService();
+    } catch (error) {
+      console.error("Logout API failed:", error);
+    } finally {
+      storage.remove(AUTH_STORAGE_KEY);
+      setAuth(null);
+    }
   };
 
   return (
@@ -61,7 +68,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         isAuthenticated: !!auth?.accessToken,
         isLoading,
         loginContext,
-        logout,
+        logoutContext,
       }}
     >
       {children}

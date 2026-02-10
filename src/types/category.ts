@@ -15,3 +15,8 @@ export interface IUpdateCategoryDto {
   name?: string;
   description?: string;
 }
+
+export interface ICategoryListResponse {
+  items: ICategory[];
+  total: number;
+}

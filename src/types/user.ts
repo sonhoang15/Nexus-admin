@@ -25,3 +25,17 @@ export interface IUpdateUserDto {
   role?: TUserRole;
   status?: TUserStatus;
 }
+
+export interface IUserListResponse {
+  success: boolean;
+  data: {
+    items: IUser[];
+    meta: {
+      totalItems: number;
+      itemCount: number;
+      itemsPerPage: number;
+      totalPages: number;
+      currentPage: number;
+    };
+  };
+}
