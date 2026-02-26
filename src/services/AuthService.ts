@@ -5,21 +5,18 @@ import {
   TLoginResponse,
   IApiResponse,
   IAuthUser,
+  IAuthData,
 } from "@/types/auth";
 
-export const loginService = async (
-  data: ILoginDto,
-): Promise<TLoginResponse> => {
-  return instance.post<TLoginResponse, TLoginResponse>("/api/auth/login", data);
+export const loginService = async (data: ILoginDto): Promise<IAuthData> => {
+  return instance.post<IAuthData, IAuthData>("/api/auth/login", data);
 };
 
 export const refreshTokenService = async (
   data: IRefreshTokenDto,
 ): Promise<TLoginResponse> => {
-  return instance.post<TLoginResponse, TLoginResponse>(
-    "/api/auth/refresh",
-    data,
-  );
+  const res = await instance.post<TLoginResponse>("/api/auth/refresh", data);
+  return res.data;
 };
 
 export const getMeService = async (): Promise<IApiResponse<IAuthUser>> => {

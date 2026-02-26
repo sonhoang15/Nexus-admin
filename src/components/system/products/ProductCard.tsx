@@ -1,24 +1,24 @@
 import { StockBadge } from "@/components/system/products/StockBadge";
 import { Card, CardContent } from "@/components/ui/card";
-import { TProduct } from "@/types";
+import { IProduct } from "@/types/product";
 import { Button } from "@/components/ui/button";
 import { Eye, Pencil, Trash2, Star } from "lucide-react";
 import { cn } from "@/libs/utils";
 
 type Props = {
-  product: TProduct;
-  onView: (product: TProduct) => void;
-  onEdit: (product: TProduct) => void;
-  onDelete: (product: TProduct) => void;
+  product: IProduct;
+  onView: (product: IProduct) => void;
+  onEdit: (product: IProduct) => void;
+  onDelete: (product: IProduct) => void;
 };
 
 export function ProductCard({ product, onView, onEdit, onDelete }: Props) {
   return (
     <Card className="relative overflow-hidden group transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.15)]">
       <div className="relative aspect-video bg-muted overflow-hidden">
-        {product.images[0] ? (
+        {product.mainImage ? (
           <img
-            src={product.images[0]}
+            src={`${import.meta.env.VITE_BASE_URL}${product.mainImage}`}
             alt={product.name}
             className="w-full h-full object-cover transition-transform duration-300 ease-out group-hover:scale-105"
           />
@@ -37,12 +37,12 @@ export function ProductCard({ product, onView, onEdit, onDelete }: Props) {
 
       <StockBadge
         stockUnits={product.stockUnits}
-        lowStockAlert={product.lowStockAlert}
+        lowStockAlert={product.lowStockAlert ?? 10}
       />
 
       <CardContent className="p-4">
         <p className="text-xs text-primary uppercase font-medium">
-          {product.categoryName}
+          {product.category?.name}
         </p>
 
         <h3 className="font-semibold mt-1 truncate">{product.name}</h3>
@@ -52,11 +52,11 @@ export function ProductCard({ product, onView, onEdit, onDelete }: Props) {
             <p className="text-xs text-muted-foreground uppercase">Pricing</p>
             <div className="flex items-baseline gap-2">
               <span className="font-bold text-lg">
-                ${product.discountPrice || product.basePrice}
+                ${Number(product.discountPrice || product.basePrice)}
               </span>
               {product.discountPrice && (
                 <span className="text-sm text-muted-foreground line-through">
-                  ${product.basePrice}
+                  ${Number(product.basePrice)}
                 </span>
               )}
             </div>

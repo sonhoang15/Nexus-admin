@@ -1,4 +1,6 @@
-export const DEFAULT_PRODUCT_FORM = {
+import { TProductFormData } from "@/types/product";
+
+export const DEFAULT_PRODUCT_FORM: TProductFormData = {
   sku: "",
   barcode: "",
   name: "",
@@ -8,7 +10,7 @@ export const DEFAULT_PRODUCT_FORM = {
   manufacturer: "",
   weight: "",
   dimensions: "",
-  tags: "",
+  tags: [] as string[],
   isFeatured: false,
   basePrice: 0,
   costPrice: 0,
@@ -17,4 +19,5 @@ export const DEFAULT_PRODUCT_FORM = {
   lowStockAlert: 10,
   metaTitle: "",
   metaDescription: "",
+  images: [] as { type: "new"; file: File }[],
 };

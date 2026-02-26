@@ -124,13 +124,13 @@ export function UserForm({
               }}
             />
 
-            <button
+            <Button
               type="button"
               onClick={() => setShowPassword((s) => !s)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-black"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:!none !bg-inherit"
             >
               {showPassword ? <EyeOff /> : <Eye />}
-            </button>
+            </Button>
           </div>
 
           <Button
@@ -182,7 +182,10 @@ export function UserForm({
 
       <FormActions
         submitText={editingUser ? "Update User" : "Register User"}
+        isDisabled={Object.keys(errors).length > 0}
         onCancel={onCancel}
+        CancelText="Discard"
+        onSubmit={onSubmit}
       />
     </FormCard>
   );

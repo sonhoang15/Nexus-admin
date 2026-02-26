@@ -9,11 +9,14 @@ import {
 export const getCategoriesService = async (
   limit = 10,
 ): Promise<ICategory[]> => {
-  const res = await instance.get<ICategoryListResponse>("/api/categories", {
-    params: { limit },
-  });
+  const res = await instance.get<ICategoryListResponse, ICategoryListResponse>(
+    "/api/categories",
+    {
+      params: { limit },
+    },
+  );
 
-  return res.data?.items ?? [];
+  return res.items ?? [];
 };
 
 export const createCategoryService = async (data: ICreateCategoryDto) => {

@@ -1,3 +1,4 @@
+import { ImageItem } from "@/components/system/products/steps/MediaStep";
 import { EStatus, EPromotion, ESort } from "@/enums/filters.enums";
 
 export type TProductFilters = {
@@ -9,6 +10,36 @@ export type TProductFilters = {
   sort: ESort;
 };
 
+export interface IProductImage {
+  id: string;
+  productId: string;
+  url: string;
+  isMain: boolean;
+  sortOrder: number;
+}
+
+export interface TProductFormData {
+  sku: string;
+  barcode: string;
+  name: string;
+  description: string;
+  categoryId: string;
+  brand: string;
+  manufacturer: string;
+  weight: string;
+  tags: string[];
+  isFeatured: boolean;
+  basePrice: number;
+  costPrice: number;
+  discountPrice: number;
+  stockUnits: number;
+  lowStockAlert: number;
+  metaTitle: string;
+  metaDescription: string;
+  images: ImageItem[];
+  dimensions?: string;
+}
+
 export interface IProduct {
   id: string;
   sku: string;
@@ -16,7 +47,9 @@ export interface IProduct {
   name: string;
   description?: string;
   categoryId: string;
-  categoryName?: string;
+  category?: {
+    name: string;
+  };
   brand: string;
   manufacturer: string;
   weight?: string;
@@ -30,7 +63,8 @@ export interface IProduct {
   lowStockAlert?: number;
   metaTitle?: string;
   metaDescription?: string;
-  images: string[];
+  mainImage?: string[];
+  images?: IProductImage[];
   createdAt: string;
 }
 
@@ -53,7 +87,7 @@ export interface ICreateProductDto {
   lowStockAlert?: number;
   metaTitle?: string;
   metaDescription?: string;
-  images: File[];
+  images?: File[];
 }
 
 export interface IUpdateProductDto {
@@ -76,4 +110,11 @@ export interface IUpdateProductDto {
   metaTitle?: string;
   metaDescription?: string;
   images?: File[];
+}
+
+export interface IProductListResponse {
+  items: IProduct[];
+  data: {
+    items: IProduct[];
+  };
 }

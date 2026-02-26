@@ -22,6 +22,7 @@ export interface IAuthData {
   refreshToken: string;
   expiresIn: number;
   user: IAuthUser;
+  message: string;
 }
 
 export interface IApiResponse<T> {

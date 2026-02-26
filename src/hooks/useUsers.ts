@@ -5,7 +5,7 @@ import {
   createUserApi,
   updateUserApi,
   deleteUserApi,
-} from "@/services/UserService";
+} from "@/services/UsersService";
 import { toast } from "sonner";
 
 export type TUserFormData = {

@@ -1,7 +1,7 @@
 import { createContext, useEffect, useState } from "react";
 import { loginService } from "@/services/AuthService";
 import { storage } from "@/utils/storageHelper";
-import { IAuthData, TLoginResponse } from "@/types/auth";
+import { IAuthData } from "@/types/auth";
 import { logoutService } from "@/services/AuthService";
 
 interface LoginResult {
@@ -34,16 +34,11 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     setIsLoading(false);
   }, []);
 
-  const loginContext = async (
-    email: string,
-    password: string,
-  ): Promise<LoginResult> => {
-    const res: TLoginResponse = await loginService({ email, password });
+  const loginContext = async (email: string, password: string) => {
+    const res = await loginService({ email, password });
 
-    const authData = res.data;
-
-    storage.set(AUTH_STORAGE_KEY, authData);
-    setAuth(authData);
+    storage.set(AUTH_STORAGE_KEY, res);
+    setAuth(res);
 
     return {
       message: res.message,

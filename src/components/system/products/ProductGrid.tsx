@@ -1,10 +1,10 @@
-import { Product } from "@/types";
-import { ProductCard } from "@/components/products/ProductCard";
+import { IProduct } from "@/types/product";
+import { ProductCard } from "@/components/system/products/ProductCard";
 
 type Props = {
-  products: Product[];
-  onView: (product: Product) => void;
-  onEdit: (product: Product) => void;
+  products: IProduct[];
+  onView: (product: IProduct) => void;
+  onEdit: (product: IProduct) => void;
   onDelete: (id: string) => void;
 };
 
