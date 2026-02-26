@@ -3,10 +3,11 @@ import { useProducts } from "@/hooks/useProducts";
 import { ProductToolbar } from "@/components/system/products/ProductToolbar";
 import { ProductCard } from "@/components/system/products/ProductCard";
 import { ProductForm } from "@/components/system/products/ProductForm";
-import { ProductViewDialog } from "@/components/system/products/ProductViewDialog";
+import { ProductDetail } from "@/components/system/products/ProductDetail";
 import { ProductFilters } from "@/components/system/products/ProductFilter";
 import { TProductFilters } from "@/types/product";
 import { EStatus, EPromotion, ESort } from "@/enums/filters.enums";
+import { PageHeader } from "@/components/common/PageHeader";
 
 const ProductsPage = () => {
   const {
@@ -24,8 +25,12 @@ const ProductsPage = () => {
     handleDelete,
     handleSubmit,
     handleCancel,
+    tagInput,
+    setTagInput,
+    handleKeyDown,
+    handleRemoveTag,
+    handleRemoveImage,
   } = useProducts();
-
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState<TProductFilters>({
     categories: [],
@@ -38,15 +43,26 @@ const ProductsPage = () => {
 
   return (
     <div className="space-y-6">
-      <ProductToolbar
-        search={search}
-        onSearchChange={setSearch}
-        onAdd={handleAdd}
-        showFilters={showFilters}
-        onToggleFilters={() => setShowFilters((v) => !v)}
+      <PageHeader
+        title="Product Management"
+        description="System management and detailed overview."
       />
 
-      {showFilters && <ProductFilters value={filters} onChange={setFilters} />}
+      {viewMode === "table" && (
+        <>
+          <ProductToolbar
+            search={search}
+            onSearchChange={setSearch}
+            onAdd={handleAdd}
+            showFilters={showFilters}
+            onToggleFilters={() => setShowFilters((v) => !v)}
+          />
+
+          {showFilters && (
+            <ProductFilters value={filters} onChange={setFilters} />
+          )}
+        </>
+      )}
 
       {viewMode === "table" && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -64,17 +80,22 @@ const ProductsPage = () => {
 
       {viewMode === "form" && (
         <ProductForm
-          editing={!!editingProduct}
+          tagInput={tagInput}
+          setTagInput={setTagInput}
+          handleKeyDown={handleKeyDown}
+          handleRemoveTag={handleRemoveTag}
+          editingProduct={!!editingProduct}
           formData={formData}
           setFormData={setFormData}
           onSubmit={handleSubmit}
           onClose={handleCancel}
+          handleRemoveImage={handleRemoveImage}
         />
       )}
 
-      <ProductViewDialog
+      <ProductDetail
         open={viewMode === "view"}
-        product={selectedProduct}
+        productId={selectedProduct?.id || ""}
         onClose={handleCancel}
       />
     </div>

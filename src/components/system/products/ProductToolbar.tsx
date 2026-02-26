@@ -19,13 +19,6 @@ export function ProductToolbar({
 }: Props) {
   return (
     <>
-      <div>
-        <h1 className="text-2xl font-bold">Product Management</h1>
-        <p className="text-muted-foreground">
-          System management and detailed overview.
-        </p>
-      </div>
-
       <div className="flex flex-col sm:flex-row gap-4 justify-between">
         <div className="flex gap-2 flex-1 max-w-lg">
           <div className="relative flex-1">

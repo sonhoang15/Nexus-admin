@@ -7,13 +7,14 @@ import {
 } from "@/types/user";
 
 export const getUsersApi = async (limit = 10): Promise<IUser[]> => {
-  const data = await instance.get<IUserListResponse, IUserListResponse>(
+  const res = await instance.get<IUserListResponse, IUserListResponse>(
     "/api/users",
     {
       params: { limit },
     },
   );
-  return data.data.items;
+
+  return res.items;
 };
 
 export const createUserApi = async (data: ICreateUserDto) => {

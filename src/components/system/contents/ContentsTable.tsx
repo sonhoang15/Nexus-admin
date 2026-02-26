@@ -1,4 +1,4 @@
-import { TPage } from "@/types";
+import { IPage } from "@/types";
 import {
   ExternalLink,
   Pencil,
@@ -12,8 +12,8 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/libs/utils";
 
 type Props = {
-  pages: TPage[];
-  onEdit: (page: TPage) => void;
+  pages: IPage[];
+  onEdit: (page: IPage) => void;
   onDelete: (id: string) => void;
 };
 

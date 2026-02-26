@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { mockDocuments } from "@/data/mockData";
-import { TDocument } from "@/types";
+import { IDocument } from "@/types";
 
 type ViewMode = "table" | "form";
 
 export function useDocuments() {
-  const [documents, setDocuments] = useState<TDocument[]>(mockDocuments);
+  const [documents, setDocuments] = useState<IDocument[]>(mockDocuments);
   const [viewMode, setViewMode] = useState<ViewMode>("table");
 
   const [formData, setFormData] = useState<{
@@ -30,7 +30,7 @@ export function useDocuments() {
 
     const today = new Date().toISOString().split("T")[0];
 
-    const newDocument: TDocument = {
+    const newDocument: IDocument = {
       id: Date.now().toString(),
       title: formData.title || formData.file.name.replace(/\.[^/.]+$/, ""),
       fileName: formData.file.name,

@@ -1,20 +1,51 @@
-import { useState } from "react";
-import { TProduct } from "@/types";
-import { mockProducts, mockCategories } from "@/data/mockData";
+import { useEffect, useState } from "react";
+import { IProduct } from "@/types";
+import {
+  getProducts,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+  getProductById,
+  uploadProductImages,
+  deleteProductImage,
+} from "@/services/ProductsService";
 import { DEFAULT_PRODUCT_FORM } from "@/constants/productDefaults";
+import { TProductFormData } from "@/types/product";
 
 type ViewMode = "table" | "form" | "view";
 
 export function useProducts() {
-  const [products, setProducts] = useState<TProduct[]>(mockProducts);
+  const [products, setProducts] = useState<IProduct[]>([]);
   const [search, setSearch] = useState("");
   const [viewMode, setViewMode] = useState<ViewMode>("table");
 
-  const [selectedProduct, setSelectedProduct] = useState<TProduct | null>(null);
-  const [editingProduct, setEditingProduct] = useState<TProduct | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<IProduct | null>(null);
+  const [editingProduct, setEditingProduct] = useState<IProduct | null>(null);
 
-  const [formData, setFormData] =
-    useState<typeof DEFAULT_PRODUCT_FORM>(DEFAULT_PRODUCT_FORM);
+  const [tagInput, setTagInput] = useState("");
+  const [errors, setErrors] = useState<{ tags?: string }>({});
+
+  const [formData, setFormData] = useState<TProductFormData>({
+    ...DEFAULT_PRODUCT_FORM,
+    tags: [],
+    images: [],
+  });
+
+  const [deletedImageIds, setDeletedImageIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      const data = await getProducts();
+      setProducts(
+        data?.items?.map((p) => ({
+          ...p,
+          tags: p.tags ?? [],
+        })) || [],
+      );
+    };
+
+    fetchProducts();
+  }, []);
 
   const filteredProducts = products.filter(
     (p) =>
@@ -24,84 +55,162 @@ export function useProducts() {
 
   const handleAdd = () => {
     setEditingProduct(null);
-    setFormData(DEFAULT_PRODUCT_FORM);
-    setViewMode("form");
-  };
-
-  const handleEdit = (product: TProduct) => {
-    setEditingProduct(product);
     setFormData({
-      sku: product.sku,
-      barcode: product.barcode || "",
-      name: product.name,
-      description: product.description || "",
-      categoryId: product.categoryId,
-      brand: product.brand,
-      manufacturer: product.manufacturer,
-      weight: product.weight || "",
-      dimensions: product.dimensions || "",
-      tags: product.tags.join(", "),
-      isFeatured: product.isFeatured,
-      basePrice: product.basePrice,
-      costPrice: product.costPrice || 0,
-      discountPrice: product.discountPrice || 0,
-      stockUnits: product.stockUnits,
-      lowStockAlert: product.lowStockAlert || 10,
-      metaTitle: product.metaTitle || "",
-      metaDescription: product.metaDescription || "",
+      ...DEFAULT_PRODUCT_FORM,
+      tags: [],
+      images: [],
     });
     setViewMode("form");
   };
 
-  const handleView = (product: TProduct) => {
+  const handleEdit = async (product: IProduct) => {
+    try {
+      const fullProduct = await getProductById(product.id);
+
+      const mappedImages =
+        fullProduct.images?.map((img) => ({
+          type: "old" as const,
+          id: img.id,
+          url: img.url,
+        })) ?? [];
+
+      const formData = {
+        sku: fullProduct.sku,
+        barcode: fullProduct.barcode || "",
+        name: fullProduct.name,
+        description: fullProduct.description || "",
+        categoryId: fullProduct.categoryId,
+        brand: fullProduct.brand,
+        manufacturer: fullProduct.manufacturer,
+        weight: fullProduct.weight || "",
+        dimensions: fullProduct.dimensions || "",
+        tags: fullProduct.tags ?? [],
+        isFeatured: fullProduct.isFeatured,
+        basePrice: fullProduct.basePrice,
+        costPrice: fullProduct.costPrice || 0,
+        discountPrice: fullProduct.discountPrice || 0,
+        stockUnits: fullProduct.stockUnits,
+        lowStockAlert: fullProduct.lowStockAlert || 10,
+        metaTitle: fullProduct.metaTitle || "",
+        metaDescription: fullProduct.metaDescription || "",
+        images: mappedImages,
+      };
+
+      setEditingProduct(fullProduct);
+      setFormData(formData);
+      setViewMode("form");
+
+      console.log("Form data set for editing:", formData);
+    } catch (error) {
+      console.error("Failed to load product detail:", error);
+    }
+  };
+  const handleView = (product: IProduct) => {
     setSelectedProduct(product);
     setViewMode("view");
   };
 
-  const handleDelete = (id: string) => {
-    setProducts(products.filter((p) => p.id !== id));
+  const handleDelete = async (id: string) => {
+    await deleteProduct(id);
+    setProducts((prev) => prev.filter((p) => p.id !== id));
   };
 
-  const handleSubmit = () => {
-    const category = mockCategories.find((c) => c.id === formData.categoryId);
-
-    if (editingProduct) {
-      setProducts(
-        products.map((p) =>
-          p.id === editingProduct.id
-            ? {
-                ...p,
-                ...formData,
-                categoryName: category?.name,
-                tags: formData.tags.split(",").map((t) => t.trim()),
-              }
-            : p,
-        ),
-      );
-    } else {
-      setProducts([
-        ...products,
-        {
-          id: Date.now().toString(),
-          ...formData,
-          categoryName: category?.name,
-          tags: formData.tags.split(",").map((t) => t.trim()),
-          images: [],
-          createdAt: new Date().toISOString().split("T")[0],
-        },
-      ]);
+  const handleSubmit = async () => {
+    if (formData.tags.length < 1 || formData.tags.length > 8) {
+      setErrors({ tags: "Tags must be between 1 and 8" });
+      return;
     }
 
-    setEditingProduct(null);
-    setFormData(DEFAULT_PRODUCT_FORM);
-    setViewMode("table");
+    try {
+      const newFiles = formData.images
+        .filter((img) => img.type === "new")
+        .map((img) => img.file);
+
+      if (editingProduct) {
+        const { images, ...payload } = formData;
+
+        if (deletedImageIds.length > 0) {
+          for (const imageId of deletedImageIds) {
+            await deleteProductImage(editingProduct.id, imageId);
+          }
+        }
+
+        if (newFiles.length > 0) {
+          await uploadProductImages(editingProduct.id, newFiles);
+        }
+
+        await updateProduct(editingProduct.id, payload);
+
+        setDeletedImageIds([]);
+      } else {
+        if (newFiles.length === 0) {
+          alert("Product must have at least one image");
+          return;
+        }
+
+        await createProduct({
+          ...formData,
+          images: newFiles.map((file) => ({ type: "new", file })),
+        });
+      }
+
+      const data = await getProducts();
+      setProducts(data.items);
+
+      setEditingProduct(null);
+      setFormData({
+        ...DEFAULT_PRODUCT_FORM,
+        tags: [],
+        images: [],
+      });
+
+      setViewMode("table");
+    } catch (error) {
+      console.error("Submit failed:", error);
+    }
   };
 
-  const handleCancel = () => {
-    setEditingProduct(null);
-    setSelectedProduct(null);
-    setFormData(DEFAULT_PRODUCT_FORM);
-    setViewMode("table");
+  const handleRemoveImage = (image: any) => {
+    if (image.type === "old") {
+      setDeletedImageIds((prev) => [...prev, image.id]);
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      images: prev.images.filter((img) => img !== image),
+    }));
+    console.log("Image object:", image);
+  };
+
+  const handleRemoveTag = (tagToRemove: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      tags: prev.tags.filter((tag) => tag !== tagToRemove),
+    }));
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key !== "Enter") return;
+
+    e.preventDefault();
+
+    const value = tagInput.trim();
+    if (!value) return;
+
+    if (formData.tags.length >= 8) {
+      setErrors({ tags: "Maximum 8 tags allowed" });
+      return;
+    }
+
+    if (formData.tags.includes(value)) return;
+
+    setFormData((prev) => ({
+      ...prev,
+      tags: [...prev.tags, value],
+    }));
+
+    setTagInput("");
+    setErrors({});
   };
 
   return {
@@ -111,15 +220,31 @@ export function useProducts() {
     selectedProduct,
     editingProduct,
     formData,
+    tagInput,
+    errors,
 
     setSearch,
     setFormData,
+    setTagInput,
 
     handleAdd,
     handleEdit,
     handleView,
     handleDelete,
     handleSubmit,
-    handleCancel,
+    handleCancel: () => {
+      setEditingProduct(null);
+      setSelectedProduct(null);
+      setFormData({
+        ...DEFAULT_PRODUCT_FORM,
+        tags: [],
+        images: [],
+      });
+      setViewMode("table");
+    },
+
+    handleRemoveTag,
+    handleKeyDown,
+    handleRemoveImage,
   };
 }

@@ -34,9 +34,9 @@ export function LatestProducts({ products, onViewAll }: ILatestProductsProps) {
           {products.map((product) => (
             <div key={product.id} className="flex items-center gap-4">
               <div className="h-12 w-12 rounded-lg bg-muted flex items-center justify-center overflow-hidden">
-                {product.images[0] ? (
+                {product.mainImage ? (
                   <img
-                    src={product.images[0]}
+                    src={`${import.meta.env.VITE_BASE_URL}${product.mainImage}`}
                     alt={product.name}
                     className="h-full w-full object-cover"
                   />
@@ -47,7 +47,7 @@ export function LatestProducts({ products, onViewAll }: ILatestProductsProps) {
               <div className="flex-1 min-w-0">
                 <p className="font-medium truncate">{product.name}</p>
                 <p className="text-xs text-muted-foreground uppercase">
-                  {product.brand} • {product.categoryName}
+                  {product.brand} • {product.category?.name}
                 </p>
               </div>
               <div className="text-right">

@@ -2,7 +2,7 @@ import { PageHeader } from "@/components/common/PageHeader";
 import { ListToolbar } from "@/components/common/ListToolbar";
 import { DataTable } from "@/components/common/DataTable";
 import { CategoryForm } from "@/components/system/categories/CategoryForm";
-import { categoryColumns } from "@/components/system/categories/category.columns";
+import { categoryColumns } from "@/components/system/categories/Category.columns";
 import { useCategories } from "@/hooks/useCategories";
 import { ConfirmDeleteModal } from "@/components/common/ConfirmDeleteModal";
 
