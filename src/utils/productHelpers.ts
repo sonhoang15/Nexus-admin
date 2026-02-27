@@ -6,3 +6,8 @@ export function getStockStatus(product: IProduct) {
   }
   return { label: "IN STOCK", variant: "default" as const };
 }
+
+export const API_BASE = import.meta.env.VITE_BASE_URL;
+
+export const buildUrl = (path?: string) =>
+  path?.startsWith("http") ? path : `${API_BASE}${path}`;

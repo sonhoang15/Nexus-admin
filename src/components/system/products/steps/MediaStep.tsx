@@ -1,8 +1,7 @@
 import { useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { UploadIcon } from "lucide-react";
-
-const API_BASE_URL = import.meta.env.VITE_BASE_URL;
+import { API_BASE } from "@/utils/productHelpers";
 
 export type ImageItem =
   | {
@@ -38,7 +37,7 @@ export function MediaStep({ images, setImages, errors, onRemoveImage }: Props) {
 
   const getImageSrc = (image: ImageItem) => {
     if (image.type === "old") {
-      const src = `${API_BASE_URL}${image.url}`;
+      const src = `${API_BASE}${image.url}`;
       return src;
     }
     return URL.createObjectURL(image.file);

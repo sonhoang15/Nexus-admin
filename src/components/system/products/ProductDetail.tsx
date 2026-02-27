@@ -11,6 +11,7 @@ import {
   Info,
   Star,
 } from "lucide-react";
+import { API_BASE } from "@/utils/productHelpers";
 
 export function ProductDetail({
   open,
@@ -35,9 +36,7 @@ export function ProductDetail({
   useEffect(() => {
     if (product?.images?.length) {
       const main = product.images.find((img) => img.isMain);
-      setSelectedImage(
-        `${import.meta.env.VITE_BASE_URL}${main?.url || product.images[0].url}`,
-      );
+      setSelectedImage(`${API_BASE}${main?.url || product.images[0].url}`);
     }
   }, [product]);
 
@@ -147,7 +146,7 @@ export function ProductDetail({
 
             <div className="flex justify-center gap-5 mt-6">
               {product.images?.map((img) => {
-                const imgUrl = `${import.meta.env.VITE_BASE_URL}${img.url}`;
+                const imgUrl = `${API_BASE}${img.url}`;
                 const isActive = selectedImage === imgUrl;
 
                 return (

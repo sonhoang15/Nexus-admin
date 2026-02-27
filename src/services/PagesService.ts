@@ -1,20 +1,17 @@
 import instance from "@/libs/axios";
-
-export interface Page {
-  id: number;
-  title: string;
-  slug: string;
-  content: string;
-  thumbnail?: string;
-  createdAt: string;
-  updatedAt: string;
-}
+import { IPage } from "@/types/page";
 
 export interface PagePayload {
   title: string;
   slug: string;
   content: string;
-  thumbnail?: File | null;
+  status: "PUBLISHED" | "DRAFT";
+  featuredImage?: File | null;
+}
+
+interface PaginatedResponse<T> {
+  items: T[];
+  meta: any;
 }
 
 const toFormData = (payload: PagePayload): FormData => {
@@ -23,28 +20,32 @@ const toFormData = (payload: PagePayload): FormData => {
   formData.append("title", payload.title);
   formData.append("slug", payload.slug);
   formData.append("content", payload.content);
+  formData.append("status", payload.status);
 
-  if (payload.thumbnail) {
-    formData.append("thumbnail", payload.thumbnail);
+  if (payload.featuredImage) {
+    formData.append("featuredImage", payload.featuredImage);
   }
 
   return formData;
 };
 
 export const pageService = {
-  getAll: (): Promise<Page[]> => {
-    return instance.get("/api/pages");
+  getAll: async (): Promise<IPage[]> => {
+    const res = (await instance.get<PaginatedResponse<IPage>>(
+      "/api/pages",
+    )) as unknown as PaginatedResponse<IPage>;
+
+    return res.items;
+  },
+  getById: async (id: string): Promise<IPage> => {
+    return (await instance.get<IPage>(`/api/pages/${id}`)) as unknown as IPage;
   },
 
-  getById: (id: number): Promise<Page> => {
-    return instance.get(`/api/pages/${id}`);
-  },
-
-  getBySlug: (slug: string): Promise<Page> => {
+  getBySlug: (slug: string): Promise<IPage> => {
     return instance.get(`/api/pages/slug/${slug}`);
   },
 
-  create: (payload: PagePayload): Promise<Page> => {
+  create: (payload: PagePayload): Promise<IPage> => {
     const formData = toFormData(payload);
 
     return instance.post("/api/pages", formData, {
@@ -54,7 +55,7 @@ export const pageService = {
     });
   },
 
-  update: (id: number, payload: PagePayload): Promise<Page> => {
+  update: (id: string, payload: PagePayload): Promise<IPage> => {
     const formData = toFormData(payload);
 
     return instance.put(`/api/pages/${id}`, formData, {
@@ -64,7 +65,7 @@ export const pageService = {
     });
   },
 
-  delete: (id: number): Promise<void> => {
+  delete: (id: string): Promise<void> => {
     return instance.delete(`/api/pages/${id}`);
   },
 };
