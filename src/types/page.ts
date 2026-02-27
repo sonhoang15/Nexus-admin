@@ -8,7 +8,7 @@ export interface IPage {
   status: TPageStatus;
   featuredImage?: string;
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string;
 }
 
 export interface ICreatePageDto {

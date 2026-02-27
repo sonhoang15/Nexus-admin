@@ -5,6 +5,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/libs/utils";
 import { X, FileText, Image as ImageIcon, Upload } from "lucide-react";
+import { useEffect, useState } from "react";
+import { API_BASE } from "@/utils/productHelpers";
 
 type Props = {
   open: boolean;
@@ -14,10 +16,13 @@ type Props = {
     slug: string;
     content: string;
     status: TPageStatus;
+    featuredImage?: File;
   };
+  featuredImageUrl?: string;
   onClose: () => void;
   onChange: (data: Props["formData"]) => void;
   onSubmit: () => void;
+  submitting?: boolean;
 };
 
 export function ContentsEditor({
@@ -27,8 +32,25 @@ export function ContentsEditor({
   onClose,
   onChange,
   onSubmit,
+  submitting = false,
 }: Props) {
   if (!open) return null;
+  const [preview, setPreview] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (formData.featuredImage) {
+      const url = URL.createObjectURL(formData.featuredImage);
+      setPreview(url);
+
+      return () => URL.revokeObjectURL(url);
+    }
+  }, [formData.featuredImage]);
+
+  useEffect(() => {
+    if (editingPage?.featuredImage) {
+      setPreview(`${API_BASE}${editingPage.featuredImage}`);
+    }
+  }, [editingPage]);
 
   return (
     <div className="rounded-2xl border bg-background shadow-md shadow-black/10">
@@ -119,15 +141,44 @@ export function ContentsEditor({
           </div>
 
           <div className="rounded-xl border p-4 space-y-3">
-            <Label className="flex items-center gap-2">
-              <ImageIcon className="w-4 h-4" />
-              Featured image
+            <Label className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide">
+              <ImageIcon className="w-4 h-4 text-primary" />
+              Featured Image
             </Label>
 
-            <div className="h-40 rounded-lg border border-dashed flex flex-col items-center justify-center gap-2 text-sm text-muted-foreground hover:bg-muted cursor-pointer">
-              <Upload className="w-5 h-5" />
-              <span>Click to upload</span>
-            </div>
+            <input
+              type="file"
+              accept="image/*"
+              id="featuredImage"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  onChange({ ...formData, featuredImage: file });
+                }
+              }}
+            />
+
+            <label htmlFor="featuredImage" className="block cursor-pointer">
+              {preview ? (
+                <div className="relative group">
+                  <img
+                    src={preview}
+                    alt="Preview"
+                    className="w-full h-48 object-cover rounded-xl"
+                  />
+
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition rounded-xl flex items-center justify-center text-white text-sm">
+                    Click to change image
+                  </div>
+                </div>
+              ) : (
+                <div className="h-48 rounded-xl border border-dashed flex flex-col items-center justify-center gap-2 text-sm text-muted-foreground hover:bg-muted transition">
+                  <Upload className="w-6 h-6" />
+                  <span>Click to upload image</span>
+                </div>
+              )}
+            </label>
           </div>
         </div>
       </div>
@@ -143,9 +194,14 @@ export function ContentsEditor({
 
         <Button
           onClick={onSubmit}
+          disabled={submitting}
           className="bg-blue-500 text-white hover:bg-blue-700"
         >
-          {formData.status === "PUBLISHED" ? "Publish Now" : "Save Draft"}
+          {submitting
+            ? "Saving..."
+            : formData.status === "PUBLISHED"
+              ? "Publish Now"
+              : "Save Draft"}
         </Button>
       </div>
     </div>

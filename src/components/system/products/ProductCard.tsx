@@ -4,6 +4,7 @@ import { IProduct } from "@/types/product";
 import { Button } from "@/components/ui/button";
 import { Eye, Pencil, Trash2, Star } from "lucide-react";
 import { cn } from "@/libs/utils";
+import { API_BASE } from "@/utils/productHelpers";
 
 type Props = {
   product: IProduct;
@@ -18,7 +19,7 @@ export function ProductCard({ product, onView, onEdit, onDelete }: Props) {
       <div className="relative aspect-video bg-muted overflow-hidden">
         {product.mainImage ? (
           <img
-            src={`${import.meta.env.VITE_BASE_URL}${product.mainImage}`}
+            src={`${API_BASE}${product.mainImage}`}
             alt={product.name}
             className="w-full h-full object-cover transition-transform duration-300 ease-out group-hover:scale-105"
           />

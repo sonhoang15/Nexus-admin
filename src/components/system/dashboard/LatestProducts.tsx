@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { MoreHorizontal, ArrowRight } from "lucide-react";
 import { IProduct } from "@/types";
 import { cn } from "@/libs/utils";
+import { API_BASE } from "@/utils/productHelpers";
 
 interface ILatestProductsProps {
   products: IProduct[];
@@ -36,7 +37,7 @@ export function LatestProducts({ products, onViewAll }: ILatestProductsProps) {
               <div className="h-12 w-12 rounded-lg bg-muted flex items-center justify-center overflow-hidden">
                 {product.mainImage ? (
                   <img
-                    src={`${import.meta.env.VITE_BASE_URL}${product.mainImage}`}
+                    src={`${API_BASE}${product.mainImage}`}
                     alt={product.name}
                     className="h-full w-full object-cover"
                   />

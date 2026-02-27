@@ -11,6 +11,7 @@ export default function ContentPagesPage() {
     viewMode,
     editingPage,
     formData,
+    submitting,
 
     setSearch,
     setFormData,
@@ -52,6 +53,7 @@ export default function ContentPagesPage() {
         formData={formData}
         onChange={setFormData}
         onSubmit={handleSubmit}
+        submitting={submitting}
         onClose={handleCancel}
       />
     </div>

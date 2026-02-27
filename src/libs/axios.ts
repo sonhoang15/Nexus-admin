@@ -4,9 +4,10 @@ import axios, {
   InternalAxiosRequestConfig,
 } from "axios";
 import { toast } from "react-toastify";
+import { API_BASE } from "@/utils/productHelpers";
 
 const instance = axios.create({
-  baseURL: import.meta.env.VITE_BASE_URL,
+  baseURL: API_BASE,
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",

@@ -1,18 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
 import { pageService } from "@/services/PagesService";
-import { IPage, TPageStatus, ICreatePageDto, IUpdatePageDto } from "@/types";
+import { IPage, TPageStatus } from "@/types";
 
 type ViewMode = "table" | "form";
 
 const mapToIPage = (data: any): IPage => ({
-  id: String(data.id),
+  id: data.id,
   title: data.title,
   slug: data.slug,
-  content: data.content,
+  content: data.content ?? "",
   status: data.status,
-  featuredImage: data.thumbnail,
+  featuredImage: data.featuredImage ?? undefined,
   createdAt: data.createdAt,
-  updatedAt: data.updatedAt,
+  updatedAt: data.updatedAt ?? data.createdAt,
 });
 
 export const useContentPages = () => {
@@ -21,6 +21,7 @@ export const useContentPages = () => {
   const [search, setSearch] = useState("");
   const [viewMode, setViewMode] = useState<ViewMode>("table");
   const [editingPage, setEditingPage] = useState<IPage | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const [formData, setFormData] = useState<{
     title: string;
@@ -35,9 +36,6 @@ export const useContentPages = () => {
     status: "DRAFT",
   });
 
-  // =============================
-  // Load data
-  // =============================
   const fetchPages = async () => {
     try {
       setLoading(true);
@@ -52,9 +50,6 @@ export const useContentPages = () => {
     fetchPages();
   }, []);
 
-  // =============================
-  // Filter
-  // =============================
   const filteredPages = useMemo(() => {
     const q = search.toLowerCase();
     return pages.filter(
@@ -63,9 +58,6 @@ export const useContentPages = () => {
     );
   }, [pages, search]);
 
-  // =============================
-  // Actions
-  // =============================
   const handleAdd = () => {
     setEditingPage(null);
     setFormData({
@@ -77,59 +69,53 @@ export const useContentPages = () => {
     setViewMode("form");
   };
 
-  const handleEdit = (page: IPage) => {
-    setEditingPage(page);
-    setFormData({
-      title: page.title,
-      slug: page.slug,
-      content: page.content ?? "",
-      status: page.status,
-    });
-    setViewMode("form");
-  };
+  const handleEdit = async (page: IPage) => {
+    try {
+      const detail = await pageService.getById(page.id);
 
+      setEditingPage(detail);
+
+      setFormData({
+        title: detail.title,
+        slug: detail.slug,
+        content: detail.content ?? "",
+        status: detail.status,
+      });
+
+      setViewMode("form");
+    } catch (error) {
+      console.error("Failed to fetch page detail:", error);
+    }
+  };
   const handleDelete = async (id: string) => {
-    await pageService.delete(Number(id));
+    await pageService.delete(id);
     setPages((prev) => prev.filter((p) => p.id !== id));
   };
 
   const handleSubmit = async () => {
     try {
-      if (editingPage) {
-        const payload: IUpdatePageDto = {
-          title: formData.title,
-          slug: formData.slug,
-          content: formData.content,
-          status: formData.status,
-          featuredImage: formData.featuredImage,
-        };
+      setSubmitting(true);
 
-        const updated = await pageService.update(
-          Number(editingPage.id),
-          payload as any, // do service đang nhận PagePayload
-        );
+      if (editingPage) {
+        const updated = await pageService.update(editingPage.id, {
+          ...formData,
+        });
 
         setPages((prev) =>
           prev.map((p) => (p.id === editingPage.id ? mapToIPage(updated) : p)),
         );
       } else {
-        const payload: ICreatePageDto = {
-          title: formData.title,
-          slug: formData.slug,
-          content: formData.content,
-          status: formData.status,
-          featuredImage: formData.featuredImage,
-        };
-
-        const created = await pageService.create(payload as any);
+        const created = await pageService.create({
+          ...formData,
+        });
 
         setPages((prev) => [...prev, mapToIPage(created)]);
       }
 
       setEditingPage(null);
       setViewMode("table");
-    } catch (error) {
-      console.error(error);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -145,6 +131,7 @@ export const useContentPages = () => {
     viewMode,
     editingPage,
     formData,
+    submitting,
 
     setSearch,
     setFormData,

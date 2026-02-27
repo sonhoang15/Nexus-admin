@@ -4,7 +4,9 @@ import { Eye, Pencil, Trash2, Download, File, FileText } from "lucide-react";
 
 interface IDocumentsTableProps {
   documents: IDocument[];
-  onDelete: (id: string) => void;
+  onDelete: (doc: IDocument) => void;
+  onView: (doc: IDocument) => void;
+  onDownload: (doc: IDocument) => void;
 }
 
 const getFileIcon = (fileType: string) => {
@@ -19,7 +21,12 @@ const getFileIcon = (fileType: string) => {
   }
 };
 
-export function DocumentsTable({ documents, onDelete }: IDocumentsTableProps) {
+export function DocumentsTable({
+  documents,
+  onDelete,
+  onView,
+  onDownload,
+}: IDocumentsTableProps) {
   return (
     <div className="bg-card rounded-lg border overflow-x-auto shadow-md shadow-black/10">
       <table className="w-full">
@@ -50,8 +57,12 @@ export function DocumentsTable({ documents, onDelete }: IDocumentsTableProps) {
                   </div>
                 </div>
               </td>
-              <td className="p-4 text-muted-foreground">{doc.size}</td>
-              <td className="p-4 text-muted-foreground">{doc.owner}</td>
+              <td className="p-4 text-muted-foreground">
+                {doc.fileSizeFormatted}
+              </td>
+              <td className="p-4 text-muted-foreground">
+                {doc.owner.fullName}
+              </td>
               <td className="p-4 text-muted-foreground">{doc.updatedAt}</td>
               <td className="p-4">
                 <div className="flex justify-end gap-2">
@@ -59,6 +70,7 @@ export function DocumentsTable({ documents, onDelete }: IDocumentsTableProps) {
                     variant="ghost"
                     size="icon"
                     className="hover:bg-blue-700 text-blue-500"
+                    onClick={() => onView(doc)}
                   >
                     <Eye className="h-4 w-4" />
                   </Button>
@@ -72,7 +84,7 @@ export function DocumentsTable({ documents, onDelete }: IDocumentsTableProps) {
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => onDelete(doc.id)}
+                    onClick={() => onDelete(doc)}
                     className="hover:bg-red-700 text-red-500"
                   >
                     <Trash2 className="h-4 w-4" />
@@ -80,6 +92,7 @@ export function DocumentsTable({ documents, onDelete }: IDocumentsTableProps) {
                   <Button
                     variant="ghost"
                     size="icon"
+                    onClick={() => onDownload(doc)}
                     className="hover:bg-green-700 text-green-500"
                   >
                     <Download className="h-4 w-4" />
