@@ -61,7 +61,7 @@ export default function UsersPage() {
           formData={formData}
           onChange={setFormData}
           onSubmit={handleSubmit}
-          onCancel={handleCancel}
+          onClose={handleCancel}
         />
       )}
       <ConfirmDeleteModal

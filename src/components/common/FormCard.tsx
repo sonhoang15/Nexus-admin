@@ -11,14 +11,7 @@ type Props = {
   children: ReactNode;
 };
 
-export function FormCard({
-  icon,
-  title,
-  submitLabel,
-  onClose,
-  onSubmit,
-  children,
-}: Props) {
+export function FormCard({ icon, title, onClose, onSubmit, children }: Props) {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     onSubmit();

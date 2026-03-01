@@ -4,7 +4,7 @@ import { ICategory } from "@/types/category";
 
 export const useCategoryOptions = () => {
   const [categories, setCategories] = useState<ICategory[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const fetch = async () => {
@@ -19,6 +19,8 @@ export const useCategoryOptions = () => {
 
     fetch();
   }, []);
-
-  return { categories, loading };
+  return {
+    categories: categories.filter((c) => c.productCount > 0),
+    loading,
+  };
 };

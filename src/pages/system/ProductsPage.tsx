@@ -5,9 +5,9 @@ import { ProductCard } from "@/components/system/products/ProductCard";
 import { ProductForm } from "@/components/system/products/ProductForm";
 import { ProductDetail } from "@/components/system/products/ProductDetail";
 import { ProductFilters } from "@/components/system/products/ProductFilter";
-import { TProductFilters } from "@/types/product";
-import { EStatus, EPromotion, ESort } from "@/enums/filters.enums";
+import { useCategoryOptions } from "@/hooks/useCategoryOptions";
 import { PageHeader } from "@/components/common/PageHeader";
+import { ConfirmDeleteModal } from "@/components/common/ConfirmDeleteModal";
 
 const ProductsPage = () => {
   const {
@@ -17,6 +17,11 @@ const ProductsPage = () => {
     selectedProduct,
     editingProduct,
     formData,
+    filters,
+    tagInput,
+    deleteProductId,
+    isDeleting,
+    setFilters,
     setSearch,
     setFormData,
     handleAdd,
@@ -25,22 +30,15 @@ const ProductsPage = () => {
     handleDelete,
     handleSubmit,
     handleCancel,
-    tagInput,
     setTagInput,
     handleKeyDown,
     handleRemoveTag,
     handleRemoveImage,
+    confirmDelete,
+    cancelDelete,
   } = useProducts();
-  const [showFilters, setShowFilters] = useState(false);
-  const [filters, setFilters] = useState<TProductFilters>({
-    categories: [],
-    status: EStatus.ALL_STATUS,
-    promotion: EPromotion.ALL_PRODUCTS,
-    minPrice: 0,
-    maxPrice: 0,
-    sort: ESort.NEWEST_ADDITIONS,
-  });
-
+  const [showFilters, setShowFilters] = useState<boolean>(false);
+  const { categories, loading } = useCategoryOptions();
   return (
     <div className="space-y-6">
       <PageHeader
@@ -59,7 +57,11 @@ const ProductsPage = () => {
           />
 
           {showFilters && (
-            <ProductFilters value={filters} onChange={setFilters} />
+            <ProductFilters
+              value={filters}
+              onChange={setFilters}
+              categories={categories}
+            />
           )}
         </>
       )}
@@ -94,9 +96,18 @@ const ProductsPage = () => {
       )}
 
       <ProductDetail
+        onEdit={handleEdit}
         open={viewMode === "view"}
         productId={selectedProduct?.id || ""}
         onClose={handleCancel}
+      />
+      <ConfirmDeleteModal
+        open={!!deleteProductId}
+        loading={isDeleting}
+        entityName="product"
+        itemName={products.find((p) => p.id === deleteProductId)?.name}
+        onConfirm={confirmDelete}
+        onCancel={cancelDelete}
       />
     </div>
   );

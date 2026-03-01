@@ -1,9 +1,7 @@
 import instance from "@/libs/axios";
-import {
-  IDocumentFromBE,
-  IDocumentPayload,
-  IPaginatedResponse,
-} from "@/types/document";
+import { IDocumentFromBE, IDocumentPayload } from "@/types";
+import { throwServiceError } from "@/utils/errorServiceHelper";
+import { EDocumentApi } from "@/enums/service.enums";
 
 const toFormData = (payload: IDocumentPayload): FormData => {
   const formData = new FormData();
@@ -19,36 +17,65 @@ const toFormData = (payload: IDocumentPayload): FormData => {
 
 export const documentService = {
   getAll: async (): Promise<IDocumentFromBE[]> => {
-    const res = (await instance.get<IPaginatedResponse<IDocumentFromBE>>(
-      "/api/documents",
-    )) as unknown as IPaginatedResponse<IDocumentFromBE>;
+    try {
+      const res = await instance.get(EDocumentApi.BASE);
+      return res.data.data.items ?? [];
+    } catch (error) {
+      return throwServiceError(error);
+    }
+  },
 
-    return res.items;
+  create: async (payload: IDocumentPayload): Promise<IDocumentFromBE> => {
+    try {
+      const formData = toFormData(payload);
+
+      const { data } = await instance.post(EDocumentApi.BASE, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      return data.data;
+    } catch (error) {
+      return throwServiceError(error);
+    }
   },
 
   getById: async (id: string): Promise<IDocumentFromBE> => {
-    return (await instance.get<IDocumentFromBE>(
-      `/api/documents/${id}`,
-    )) as unknown as IDocumentFromBE;
+    try {
+      const res = await instance.get(`${EDocumentApi.BASE}/${id}`);
+      return res.data.data;
+    } catch (error) {
+      return throwServiceError(error);
+    }
   },
 
-  create: (payload: IDocumentPayload): Promise<IDocumentFromBE> => {
-    const formData = toFormData(payload);
-
-    return instance.post("/api/documents", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
+  download: async (id: string): Promise<Blob> => {
+    try {
+      const res = await instance.get(`${EDocumentApi.BASE}/${id}/download`, {
+        responseType: "blob",
+      });
+      return res.data;
+    } catch (error) {
+      return throwServiceError(error);
+    }
   },
 
-  delete: (id: string): Promise<void> => {
-    return instance.delete(`/api/documents/${id}`);
+  delete: async (id: string): Promise<void> => {
+    try {
+      await instance.delete(`${EDocumentApi.BASE}/${id}`);
+    } catch (error) {
+      return throwServiceError(error);
+    }
   },
 
-  download: (id: string): Promise<Blob> => {
-    return instance.get(`/api/documents/${id}/download`, {
-      responseType: "blob",
-    });
+  preview: async (id: string): Promise<string> => {
+    try {
+      const res = await instance.get(`${EDocumentApi.BASE}/${id}/preview`);
+      console.log("previewUrl:", res.data.data);
+      return res.data.data;
+    } catch (error) {
+      return throwServiceError(error);
+    }
   },
 };

@@ -18,7 +18,7 @@ const ALLOWED_TYPES = [
 export function useDocuments() {
   const [documents, setDocuments] = useState<IDocument[]>([]);
   const [viewMode, setViewMode] = useState<ViewMode>("table");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedDocument, setSelectedDocument] = useState<IDocument | null>(
     null,
@@ -31,6 +31,9 @@ export function useDocuments() {
     title: "",
     file: null,
   });
+
+  const [deleteDocumentId, setDeleteDocumentId] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
   const formatSize = (bytes: number) => {
     if (!bytes) return "0 B";
@@ -58,6 +61,7 @@ export function useDocuments() {
     owner: doc.owner?.fullName ?? "You",
     createdAt: formatDate(doc.createdAt),
     updatedAt: formatDate(doc.updatedAt ?? doc.createdAt),
+    url: doc.url,
 
     previewUrl: doc.previewUrl,
     downloadUrl: doc.downloadUrl,
@@ -101,7 +105,7 @@ export function useDocuments() {
       setLoading(true);
       setError(null);
 
-      const fullDoc = await documentService.getById(doc.id);
+      const fullDoc = await documentService.preview(doc.id);
 
       setSelectedDocument(mapToDocument(fullDoc));
       setViewMode("preview");
@@ -168,17 +172,29 @@ export function useDocuments() {
     }
   };
 
-  const handleDelete = async (doc: IDocument) => {
+  const handleDelete = (doc: IDocument) => {
+    setDeleteDocumentId(doc.id);
+  };
+  const confirmDelete = async () => {
+    if (!deleteDocumentId) return;
+
     try {
-      setLoading(true);
-      await documentService.delete(doc.id);
-      setDocuments((prev) => prev.filter((d) => d.id !== doc.id));
-    } catch (err) {
-      console.error("Delete failed:", err);
-      setError("Delete failed");
+      setIsDeleting(true);
+
+      await documentService.delete(deleteDocumentId);
+
+      setDocuments((prev) => prev.filter((doc) => doc.id !== deleteDocumentId));
+
+      setDeleteDocumentId(null);
+    } catch (error) {
+      console.error("Delete failed:", error);
     } finally {
-      setLoading(false);
+      setIsDeleting(false);
     }
+  };
+
+  const cancelDelete = () => {
+    setDeleteDocumentId(null);
   };
 
   const handleClose = () => {
@@ -198,9 +214,14 @@ export function useDocuments() {
     setFormData,
 
     handleUpload,
-    handleDelete,
     handleSubmit,
     handleClose,
+    handleDelete,
+
+    deleteDocumentId,
+    isDeleting,
+    confirmDelete,
+    cancelDelete,
 
     handleView,
     handleDownload,

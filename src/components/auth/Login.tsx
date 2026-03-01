@@ -1,5 +1,4 @@
 import { useState, useContext } from "react";
-import { useNavigate } from "react-router-dom";
 import { ClimbingBoxLoader } from "react-spinners";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { Button } from "@/components/ui/button";
@@ -12,7 +11,6 @@ interface ISignInValues {
 }
 
 const SignInForm = () => {
-  const navigate = useNavigate();
   const { toast } = useToast();
   const { loginContext } = useContext(UserContext)!;
 
@@ -36,8 +34,6 @@ const SignInForm = () => {
         title: "Success",
         description: res.message,
       });
-
-      navigate("/");
     } catch (error: any) {
       const message =
         error?.response?.data?.message || error?.message || "Login failed";

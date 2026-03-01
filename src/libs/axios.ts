@@ -1,10 +1,24 @@
 import axios, {
   AxiosError,
-  AxiosResponse,
   InternalAxiosRequestConfig,
+  AxiosResponse,
 } from "axios";
-import { toast } from "react-toastify";
 import { API_BASE } from "@/utils/productHelpers";
+import { toast } from "react-toastify";
+
+let isRefreshing = false;
+let failedQueue: any[] = [];
+
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
 
 const instance = axios.create({
   baseURL: API_BASE,
@@ -39,38 +53,73 @@ instance.interceptors.request.use(
 );
 
 instance.interceptors.response.use(
-  (response: AxiosResponse) => {
-    const res = response.data;
-    if (res && typeof res === "object" && "success" in res && "data" in res) {
-      return res.data;
-    }
-    return res;
-  },
-  (error: AxiosError<any>) => {
-    const status = error.response?.status || 500;
-    const message = error.response?.data?.message;
+  (response: AxiosResponse) => response,
 
-    switch (status) {
-      case 401:
-        toast.error("401 Unauthorized, please login.");
-        break;
-      case 403:
-        toast.error("403 Forbidden - Không đủ quyền.");
-        break;
-      case 404:
-        toast.error("404 Not Found - Không tìm thấy API.");
-        break;
-      case 400:
-      case 409:
-      case 422:
-        break;
-      default:
-        toast.error(message || "Something went wrong!");
-        break;
+  async (error: AxiosError<any>) => {
+    const originalRequest: any = error.config;
+    const status = error.response?.status;
+
+    if (status === 401 && !originalRequest._retry) {
+      const authStr = localStorage.getItem("auth");
+      if (!authStr) {
+        window.location.href = "/login";
+        return Promise.reject(error);
+      }
+
+      const auth = JSON.parse(authStr);
+
+      if (!auth?.refreshToken) {
+        window.location.href = "/login";
+        return Promise.reject(error);
+      }
+
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        }).then((token) => {
+          originalRequest.headers.Authorization = `Bearer ${token}`;
+          return instance(originalRequest);
+        });
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      try {
+        const res = await axios.post(`${API_BASE}/api/auth/refresh`, {
+          refreshToken: auth.refreshToken,
+        });
+
+        const newAccessToken = res.data.data.accessToken;
+
+        const newAuth = {
+          ...auth,
+          accessToken: newAccessToken,
+        };
+
+        localStorage.setItem("auth", JSON.stringify(newAuth));
+
+        processQueue(null, newAccessToken);
+
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+
+        return instance(originalRequest);
+      } catch (refreshError) {
+        processQueue(refreshError, null);
+        localStorage.removeItem("auth");
+        window.location.href = "/login";
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
+      }
     }
 
-    return Promise.reject(error.response?.data || error);
+    const backendMessage = error.response?.data?.message;
+    if (backendMessage) {
+      toast.error(backendMessage);
+    }
+
+    return Promise.reject(error);
   },
 );
-
 export default instance;

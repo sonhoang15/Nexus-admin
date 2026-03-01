@@ -16,21 +16,16 @@ import {
 import { ChevronDown } from "lucide-react";
 import { TProductFilters } from "@/types/product";
 import { EStatus, EPromotion, ESort } from "@/enums/filters.enums";
-
-const CATEGORY_OPTIONS = [
-  "Electronics",
-  "Accessories",
-  "Audio",
-  "Home Appliances",
-  "Wearables",
-];
+import { ICategory } from "@/types/category";
 
 export function ProductFilters({
   value,
   onChange,
+  categories,
 }: {
   value: TProductFilters;
   onChange: (value: TProductFilters) => void;
+  categories: ICategory[];
 }) {
   const update = <K extends keyof TProductFilters>(
     key: K,
@@ -39,13 +34,14 @@ export function ProductFilters({
     onChange({ ...value, [key]: val });
   };
 
-  const toggleCategory = (category: string) => {
-    const exists = value.categories.includes(category);
+  const toggleCategory = (categoryId: string) => {
+    const exists = value.categories.includes(categoryId);
+
     update(
       "categories",
       exists
-        ? value.categories.filter((c) => c !== category)
-        : [...value.categories, category],
+        ? value.categories.filter((c) => c !== categoryId)
+        : [...value.categories, categoryId],
     );
   };
 
@@ -79,15 +75,17 @@ export function ProductFilters({
               Clear selection
             </Button>
 
-            {CATEGORY_OPTIONS.map((c) => (
-              <div key={c} className="flex items-center gap-2">
-                <Checkbox
-                  checked={value.categories.includes(c)}
-                  onCheckedChange={() => toggleCategory(c)}
-                />
-                <span className="text-sm">{c}</span>
-              </div>
-            ))}
+            {categories
+              .filter((c) => c.productCount > 0)
+              .map((c) => (
+                <div key={c.id} className="flex items-center gap-2">
+                  <Checkbox
+                    checked={value.categories.includes(c.id)}
+                    onCheckedChange={() => toggleCategory(c.id)}
+                  />
+                  <span className="text-sm">{c.name}</span>
+                </div>
+              ))}
           </PopoverContent>
         </Popover>
       </div>

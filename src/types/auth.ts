@@ -22,13 +22,4 @@ export interface IAuthData {
   refreshToken: string;
   expiresIn: number;
   user: IAuthUser;
-  message: string;
 }
-
-export interface IApiResponse<T> {
-  success: boolean;
-  message: string;
-  data: T;
-}
-
-export type TLoginResponse = IApiResponse<IAuthData>;

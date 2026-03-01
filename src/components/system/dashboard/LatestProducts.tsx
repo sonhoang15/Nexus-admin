@@ -7,12 +7,11 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal, ArrowRight } from "lucide-react";
-import { IProduct } from "@/types";
-import { cn } from "@/libs/utils";
+import { ILatestProduct } from "@/types/dashboard";
 import { API_BASE } from "@/utils/productHelpers";
 
 interface ILatestProductsProps {
-  products: IProduct[];
+  products: ILatestProduct[];
   onViewAll: () => void;
 }
 
@@ -22,14 +21,13 @@ export function LatestProducts({ products, onViewAll }: ILatestProductsProps) {
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
           <CardTitle>Latest Products</CardTitle>
-          <CardDescription>
-            New additions to the hardware inventory.
-          </CardDescription>
+          <CardDescription>Recently added products.</CardDescription>
         </div>
         <Button variant="ghost" size="icon" className="hover:bg-black">
           <MoreHorizontal className="h-4 w-4" />
         </Button>
       </CardHeader>
+
       <CardContent>
         <div className="space-y-4">
           {products.map((product) => (
@@ -45,30 +43,32 @@ export function LatestProducts({ products, onViewAll }: ILatestProductsProps) {
                   <span className="text-muted-foreground text-xs">No img</span>
                 )}
               </div>
+
               <div className="flex-1 min-w-0">
                 <p className="font-medium truncate">{product.name}</p>
                 <p className="text-xs text-muted-foreground uppercase">
-                  {product.brand} • {product.category?.name}
+                  SKU: {product.sku}
                 </p>
               </div>
+
               <div className="text-right">
                 <p className="font-semibold text-primary">
-                  ${product.discountPrice || product.basePrice}
+                  ${Number(product.basePrice).toLocaleString()}
                 </p>
-                <p
-                  className={cn(
-                    "text-xs uppercase font-medium",
-                    product.stockUnits <= (product.lowStockAlert || 10)
-                      ? "text-destructive"
-                      : "text-success",
-                  )}
-                >
-                  {product.stockUnits} IN STOCK
+                <p className="text-xs text-muted-foreground">
+                  {new Date(product.createdAt).toLocaleDateString()}
                 </p>
               </div>
             </div>
           ))}
+
+          {products.length === 0 && (
+            <p className="text-sm text-muted-foreground text-center py-4">
+              No products yet
+            </p>
+          )}
         </div>
+
         <Button
           variant="ghost"
           className="w-full mt-4 text-muted-foreground"

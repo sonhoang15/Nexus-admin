@@ -1,11 +1,21 @@
-import { useState } from "react";
+import { useState, useContext, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import clsx from "clsx";
 import SignInForm from "@/components/auth/Login";
 import SignUpForm from "@/components/auth/Register";
 import { Button } from "@/components/ui/button";
+import { UserContext } from "@/context/UserContext";
 
 export default function AuthForm() {
   const [isRegister, setIsRegister] = useState<boolean>(false);
+  const ctx = useContext(UserContext);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (ctx?.isAuthenticated) {
+      navigate("/", { replace: true });
+    }
+  }, [ctx?.isAuthenticated]);
   return (
     <div className="w-full min-h-screen flex items-center justify-center bg-[#f6f5f7]">
       <div

@@ -1,5 +1,8 @@
 import instance from "@/libs/axios";
 import { IPage } from "@/types/page";
+import { IApiResponse } from "@/types";
+import { throwServiceError } from "@/utils/errorServiceHelper";
+import { EPageApi } from "@/enums/service.enums";
 
 export interface PagePayload {
   title: string;
@@ -11,7 +14,7 @@ export interface PagePayload {
 
 interface PaginatedResponse<T> {
   items: T[];
-  meta: any;
+  meta: unknown;
 }
 
 const toFormData = (payload: PagePayload): FormData => {
@@ -29,43 +32,91 @@ const toFormData = (payload: PagePayload): FormData => {
   return formData;
 };
 
-export const pageService = {
-  getAll: async (): Promise<IPage[]> => {
-    const res = (await instance.get<PaginatedResponse<IPage>>(
-      "/api/pages",
-    )) as unknown as PaginatedResponse<IPage>;
+export const getPagesService = async (): Promise<IPage[]> => {
+  try {
+    const { data } = await instance.get<IApiResponse<PaginatedResponse<IPage>>>(
+      EPageApi.BASE,
+    );
 
-    return res.items;
-  },
-  getById: async (id: string): Promise<IPage> => {
-    return (await instance.get<IPage>(`/api/pages/${id}`)) as unknown as IPage;
-  },
+    return data.data.items ?? [];
+  } catch (error) {
+    return throwServiceError(error);
+  }
+};
 
-  getBySlug: (slug: string): Promise<IPage> => {
-    return instance.get(`/api/pages/slug/${slug}`);
-  },
+export const getPageByIdService = async (id: string): Promise<IPage> => {
+  try {
+    const { data } = await instance.get<IApiResponse<IPage>>(
+      `${EPageApi.BASE}/${id}`,
+    );
 
-  create: (payload: PagePayload): Promise<IPage> => {
+    return data.data;
+  } catch (error) {
+    return throwServiceError(error);
+  }
+};
+
+export const getPageBySlugService = async (slug: string): Promise<IPage> => {
+  try {
+    const { data } = await instance.get<IApiResponse<IPage>>(
+      `${EPageApi.BY_SLUG}/${slug}`,
+    );
+
+    return data.data;
+  } catch (error) {
+    return throwServiceError(error);
+  }
+};
+
+export const createPageService = async (
+  payload: PagePayload,
+): Promise<IPage> => {
+  try {
     const formData = toFormData(payload);
 
-    return instance.post("/api/pages", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
+    const { data } = await instance.post<IApiResponse<IPage>>(
+      EPageApi.BASE,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       },
-    });
-  },
+    );
 
-  update: (id: string, payload: PagePayload): Promise<IPage> => {
+    return data.data;
+  } catch (error) {
+    return throwServiceError(error);
+  }
+};
+
+export const updatePageService = async (
+  id: string,
+  payload: PagePayload,
+): Promise<IPage> => {
+  try {
     const formData = toFormData(payload);
 
-    return instance.put(`/api/pages/${id}`, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
+    const { data } = await instance.put<IApiResponse<IPage>>(
+      `${EPageApi.BASE}/${id}`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       },
-    });
-  },
+    );
 
-  delete: (id: string): Promise<void> => {
-    return instance.delete(`/api/pages/${id}`);
-  },
+    return data.data;
+  } catch (error) {
+    return throwServiceError(error);
+  }
+};
+
+export const deletePageService = async (id: string): Promise<void> => {
+  try {
+    await instance.delete(`${EPageApi.BASE}/${id}`);
+  } catch (error) {
+    return throwServiceError(error);
+  }
 };

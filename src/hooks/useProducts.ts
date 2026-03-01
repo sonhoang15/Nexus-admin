@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { IProduct } from "@/types";
+import { useEffect, useState, useMemo } from "react";
+import { IProduct, TProductFilters } from "@/types";
 import {
   getProducts,
   createProduct,
@@ -11,19 +11,20 @@ import {
 } from "@/services/ProductsService";
 import { DEFAULT_PRODUCT_FORM } from "@/constants/productDefaults";
 import { TProductFormData } from "@/types/product";
+import { EStatus, EPromotion, ESort } from "@/enums/filters.enums";
 
 type ViewMode = "table" | "form" | "view";
 
 export function useProducts() {
   const [products, setProducts] = useState<IProduct[]>([]);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState<string>("");
   const [viewMode, setViewMode] = useState<ViewMode>("table");
 
   const [selectedProduct, setSelectedProduct] = useState<IProduct | null>(null);
   const [editingProduct, setEditingProduct] = useState<IProduct | null>(null);
 
-  const [tagInput, setTagInput] = useState("");
-  const [errors, setErrors] = useState<{ tags?: string }>({});
+  const [tagInput, setTagInput] = useState<string>("");
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const [formData, setFormData] = useState<TProductFormData>({
     ...DEFAULT_PRODUCT_FORM,
@@ -33,12 +34,26 @@ export function useProducts() {
 
   const [deletedImageIds, setDeletedImageIds] = useState<string[]>([]);
 
+  const [filters, setFilters] = useState<TProductFilters>({
+    categories: [],
+    status: EStatus.ALL,
+    promotion: EPromotion.ALL,
+    minPrice: 0,
+    maxPrice: 0,
+    sort: ESort.NEWEST,
+  });
+
+  const [deleteProductId, setDeleteProductId] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
+
   useEffect(() => {
     const fetchProducts = async () => {
       const data = await getProducts();
       setProducts(
         data?.items?.map((p) => ({
           ...p,
+          basePrice: Number(p.basePrice),
+          discountPrice: p.discountPrice ? Number(p.discountPrice) : undefined,
           tags: p.tags ?? [],
         })) || [],
       );
@@ -47,11 +62,103 @@ export function useProducts() {
     fetchProducts();
   }, []);
 
-  const filteredProducts = products.filter(
-    (p) =>
-      p.name.toLowerCase().includes(search.toLowerCase()) ||
-      p.sku.toLowerCase().includes(search.toLowerCase()),
-  );
+  const filteredProducts = useMemo(() => {
+    let result = [...products];
+
+    const keyword = search.trim().toLowerCase();
+    if (keyword) {
+      result = result.filter((p) =>
+        [p.name, p.sku, p.brand, p.category?.name]
+          .filter(Boolean)
+          .some((field) => field!.toLowerCase().includes(keyword)),
+      );
+    }
+
+    if (filters.categories.length) {
+      result = result.filter((p) =>
+        filters.categories.includes(p.category?.id ?? ""),
+      );
+    }
+
+    if (filters.status !== EStatus.ALL) {
+      result = result.filter((p) => {
+        const lowAlert =
+          p.lowStockAlert && p.lowStockAlert > 0 ? p.lowStockAlert : 10;
+
+        if (filters.status === EStatus.IN_STOCK) return p.stockUnits > lowAlert;
+
+        if (filters.status === EStatus.LOW_STOCK)
+          return p.stockUnits > 0 && p.stockUnits <= lowAlert;
+
+        if (filters.status === EStatus.OUT_OF_STOCK) return p.stockUnits === 0;
+
+        return true;
+      });
+    }
+
+    if (filters.promotion !== EPromotion.ALL) {
+      result = result.filter((p) => {
+        if (filters.promotion === EPromotion.FEATURED) return p.isFeatured;
+
+        if (filters.promotion === EPromotion.STANDARD) return !p.isFeatured;
+
+        return true;
+      });
+    }
+
+    if (filters.minPrice > 0 || filters.maxPrice > 0) {
+      result = result.filter((p) => {
+        const price =
+          p.discountPrice && p.discountPrice > 0
+            ? p.discountPrice
+            : p.basePrice;
+
+        if (filters.minPrice > 0 && price < filters.minPrice) return false;
+
+        if (filters.maxPrice > 0 && price > filters.maxPrice) return false;
+
+        return true;
+      });
+    }
+
+    const getFinalPrice = (p: IProduct) =>
+      p.discountPrice && p.discountPrice > 0 ? p.discountPrice : p.basePrice;
+
+    switch (filters.sort) {
+      case ESort.PRICE_LOW:
+        result.sort((a, b) => getFinalPrice(a) - getFinalPrice(b));
+        break;
+
+      case ESort.PRICE_HIGH:
+        result.sort((a, b) => getFinalPrice(b) - getFinalPrice(a));
+        break;
+
+      case ESort.STOCK_LOW:
+        result.sort((a, b) => a.stockUnits - b.stockUnits);
+        break;
+
+      case ESort.STOCK_HIGH:
+        result.sort((a, b) => b.stockUnits - a.stockUnits);
+        break;
+
+      case ESort.NAME_ASC:
+        result.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+
+      case ESort.NAME_DESC:
+        result.sort((a, b) => b.name.localeCompare(a.name));
+        break;
+
+      case ESort.NEWEST:
+      default:
+        result.sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+        );
+    }
+
+    return result;
+  }, [products, search, filters]);
 
   const handleAdd = () => {
     setEditingProduct(null);
@@ -79,7 +186,7 @@ export function useProducts() {
         barcode: fullProduct.barcode || "",
         name: fullProduct.name,
         description: fullProduct.description || "",
-        categoryId: fullProduct.categoryId,
+        categoryId: fullProduct.category?.id || "",
         brand: fullProduct.brand,
         manufacturer: fullProduct.manufacturer,
         weight: fullProduct.weight || "",
@@ -110,9 +217,30 @@ export function useProducts() {
     setViewMode("view");
   };
 
-  const handleDelete = async (id: string) => {
-    await deleteProduct(id);
-    setProducts((prev) => prev.filter((p) => p.id !== id));
+  const handleDelete = (id: string) => {
+    setDeleteProductId(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteProductId) return;
+
+    try {
+      setIsDeleting(true);
+
+      await deleteProduct(deleteProductId);
+
+      setProducts((prev) => prev.filter((p) => p.id !== deleteProductId));
+
+      setDeleteProductId(null);
+    } catch (error) {
+      console.error("Delete failed:", error);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const cancelDelete = () => {
+    setDeleteProductId(null);
   };
 
   const handleSubmit = async () => {
@@ -147,9 +275,14 @@ export function useProducts() {
           alert("Product must have at least one image");
           return;
         }
-
+        console.log("Submitting data:", formData);
         await createProduct({
           ...formData,
+          tags: Array.isArray(formData.tags)
+            ? formData.tags
+            : formData.tags
+              ? [formData.tags]
+              : [],
           images: newFiles.map((file) => ({ type: "new", file })),
         });
       }
@@ -216,14 +349,18 @@ export function useProducts() {
   return {
     products: filteredProducts,
     search,
+    filters,
     viewMode,
     selectedProduct,
     editingProduct,
     formData,
     tagInput,
     errors,
+    deleteProductId,
+    isDeleting,
 
     setSearch,
+    setFilters,
     setFormData,
     setTagInput,
 
@@ -246,5 +383,8 @@ export function useProducts() {
     handleRemoveTag,
     handleKeyDown,
     handleRemoveImage,
+
+    confirmDelete,
+    cancelDelete,
   };
 }

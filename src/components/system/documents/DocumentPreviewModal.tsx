@@ -1,13 +1,21 @@
 import { X, Download, FileText, File } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { IDocument } from "@/types";
-import { buildUrl } from "@/utils/productHelpers";
+import { API_BASE } from "@/utils/productHelpers";
 
 interface Props {
   document: IDocument | null;
   open: boolean;
   onClose: () => void;
 }
+
+const buildUrl = (path?: string) => {
+  if (!path) return "";
+
+  if (path.startsWith("http")) return path;
+
+  return `${API_BASE}${path}`;
+};
 
 export default function DocumentPreviewModal({
   document,
@@ -19,29 +27,25 @@ export default function DocumentPreviewModal({
   const fileType = document.fileType?.toUpperCase() || "";
 
   const isPdf = fileType === "PDF";
-  const isImage = ["JPG", "JPEG", "PNG", "JFIF"].includes(fileType);
+  const isImage = ["JPG", "JPEG", "PNG", "JFIF", "WEBP"].includes(fileType);
   const isOffice = ["DOC", "DOCX", "XLS", "XLSX"].includes(fileType);
 
-  const previewUrl = buildUrl(document.previewUrl);
-  const fileUrl = buildUrl(document.fileUrl);
-  const downloadUrl = buildUrl(document.downloadUrl);
+  const previewUrl = buildUrl(document.previewUrl || document.url);
 
+  const fileUrl = buildUrl(document.downloadUrl || document.url);
+
+  const downloadUrl = buildUrl(document.downloadUrl || document.url);
   const renderPreview = () => {
-    // IMAGE
     if (isImage && fileUrl) {
       return (
         <img
           src={fileUrl}
           alt={document.title}
-          className="max-h-full mx-auto object-contain"
-          onError={(e) => {
-            (e.target as HTMLImageElement).style.display = "none";
-          }}
+          className="max-h-full max-w-full mx-auto object-contain"
         />
       );
     }
 
-    // PDF
     if (isPdf && previewUrl) {
       return (
         <iframe
@@ -52,7 +56,6 @@ export default function DocumentPreviewModal({
       );
     }
 
-    // OFFICE FILE
     if (isOffice && fileUrl) {
       return (
         <iframe
@@ -65,7 +68,6 @@ export default function DocumentPreviewModal({
       );
     }
 
-    // FALLBACK
     return (
       <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
         <File className="h-12 w-12 mb-4" />
@@ -91,7 +93,6 @@ export default function DocumentPreviewModal({
         className="w-[95%] max-w-6xl h-[90vh] bg-background rounded-3xl shadow-2xl flex flex-col overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* HEADER */}
         <div className="flex items-center justify-between px-8 py-6 border-b">
           <div className="flex items-center gap-4">
             <div className="p-3 rounded-xl bg-muted">
@@ -133,14 +134,12 @@ export default function DocumentPreviewModal({
           </div>
         </div>
 
-        {/* BODY */}
         <div className="flex-1 bg-muted/30 p-6 overflow-auto">
           <div className="w-full h-full bg-card rounded-2xl shadow-inner overflow-hidden flex items-center justify-center">
             {renderPreview()}
           </div>
         </div>
 
-        {/* FOOTER */}
         <div className="px-8 py-4 border-t flex justify-between text-xs text-muted-foreground">
           <div>SYSTEM: NEXUS CLOUD STORAGE • REGION: US-EAST-1</div>
           <div className="font-semibold text-indigo-600 tracking-wide">

@@ -46,8 +46,8 @@ export interface IProduct {
   barcode?: string;
   name: string;
   description?: string;
-  categoryId: string;
   category?: {
+    id: string;
     name: string;
   };
   brand: string;

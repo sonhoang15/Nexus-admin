@@ -1,29 +1,95 @@
 import instance from "@/libs/axios";
-import {
-  ISetting,
-  ISettingListResponse,
-  CreateSettingDto,
-  IUpdateSettingDto,
-} from "@/types";
+import { ISetting, CreateSettingDto, IUpdateSettingDto } from "@/types";
+import { IApiResponse } from "@/types";
+import { throwServiceError } from "@/utils/errorServiceHelper";
+import { ESettingApi } from "@/enums/service.enums";
 
-const BASE_URL = "/api/settings";
+export const getSettingsService = async (
+  limit = 10,
+): Promise<IApiResponse<ISetting[]>> => {
+  try {
+    const { data } = await instance.get<IApiResponse<ISetting[]>>(
+      ESettingApi.BASE,
+      {
+        params: { limit },
+      },
+    );
 
-const settingsService = {
-  getAll: (): Promise<ISettingListResponse> => instance.get(BASE_URL),
-
-  getById: (id: string): Promise<ISetting> => instance.get(`${BASE_URL}/${id}`),
-
-  getByKey: (key: string): Promise<ISetting> =>
-    instance.get(`${BASE_URL}/key/${key}`),
-
-  create: (data: CreateSettingDto): Promise<ISetting> =>
-    instance.post(BASE_URL, data),
-
-  update: (id: string, data: IUpdateSettingDto): Promise<ISetting> =>
-    instance.put(`${BASE_URL}/${id}`, data),
-
-  delete: (id: string): Promise<Record<string, never>> =>
-    instance.delete(`${BASE_URL}/${id}`),
+    return data;
+  } catch (error) {
+    return throwServiceError(error);
+  }
 };
 
-export default settingsService;
+export const getSettingByIdService = async (
+  id: string,
+): Promise<IApiResponse<ISetting>> => {
+  try {
+    const { data } = await instance.get<IApiResponse<ISetting>>(
+      `${ESettingApi.BASE}/${id}`,
+    );
+
+    return data;
+  } catch (error) {
+    return throwServiceError(error);
+  }
+};
+
+export const getSettingByKeyService = async (
+  key: string,
+): Promise<IApiResponse<ISetting>> => {
+  try {
+    const { data } = await instance.get<IApiResponse<ISetting>>(
+      `${ESettingApi.BY_KEY}/${key}`,
+    );
+
+    return data;
+  } catch (error) {
+    return throwServiceError(error);
+  }
+};
+
+export const createSettingService = async (
+  payload: CreateSettingDto,
+): Promise<IApiResponse<ISetting>> => {
+  try {
+    const { data } = await instance.post<IApiResponse<ISetting>>(
+      ESettingApi.BASE,
+      payload,
+    );
+
+    return data;
+  } catch (error) {
+    return throwServiceError(error);
+  }
+};
+
+export const updateSettingService = async (
+  id: string,
+  payload: IUpdateSettingDto,
+): Promise<IApiResponse<ISetting>> => {
+  try {
+    const { data } = await instance.put<IApiResponse<ISetting>>(
+      `${ESettingApi.BASE}/${id}`,
+      payload,
+    );
+
+    return data;
+  } catch (error) {
+    return throwServiceError(error);
+  }
+};
+
+export const deleteSettingService = async (
+  id: string,
+): Promise<IApiResponse<void>> => {
+  try {
+    const { data } = await instance.delete<IApiResponse<void>>(
+      `${ESettingApi.BASE}/${id}`,
+    );
+
+    return data;
+  } catch (error) {
+    return throwServiceError(error);
+  }
+};
