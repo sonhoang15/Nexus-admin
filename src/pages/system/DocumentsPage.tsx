@@ -3,12 +3,15 @@ import { DocumentsTable } from "@/components/system/documents/DocumentsTable";
 import { UploadDocumentForm } from "@/components/system/documents/UploadDocumentForm";
 import { useDocuments } from "@/hooks/useDocuments";
 import DocumentPreviewModal from "@/components/system/documents/DocumentPreviewModal";
+import { ConfirmDeleteModal } from "@/components/common/ConfirmDeleteModal";
 
 export default function DocumentsPage() {
   const {
     documents,
     viewMode,
     formData,
+    deleteDocumentId,
+    isDeleting,
     selectedDocument,
     setFormData,
     handleUpload,
@@ -17,6 +20,9 @@ export default function DocumentsPage() {
     handleClose,
     handleView,
     handleDownload,
+
+    confirmDelete,
+    cancelDelete,
   } = useDocuments();
 
   return (
@@ -48,6 +54,15 @@ export default function DocumentsPage() {
           onClose={handleClose}
         />
       )}
+
+      <ConfirmDeleteModal
+        open={!!deleteDocumentId}
+        loading={isDeleting}
+        entityName="document"
+        itemName={documents.find((d) => d.id === deleteDocumentId)?.title}
+        onConfirm={confirmDelete}
+        onCancel={cancelDelete}
+      />
     </div>
   );
 }

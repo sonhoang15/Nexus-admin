@@ -5,26 +5,71 @@ import {
   IUpdateUserDto,
   IUserListResponse,
 } from "@/types/user";
+import { throwServiceError } from "@/utils/errorServiceHelper";
+import { EUserApi } from "@/enums/service.enums";
 
-export const getUsersApi = async (limit = 10): Promise<IUser[]> => {
-  const res = await instance.get<IUserListResponse, IUserListResponse>(
-    "/api/users",
-    {
-      params: { limit },
-    },
-  );
+export interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+}
 
-  return res.items;
+export const getUsersService = async (limit = 10): Promise<IUser[]> => {
+  try {
+    const res = await instance.get<ApiResponse<IUserListResponse>>(
+      EUserApi.BASE,
+      { params: { limit } },
+    );
+
+    return res.data.data.items ?? [];
+  } catch (error) {
+    return throwServiceError(error);
+  }
 };
 
-export const createUserApi = async (data: ICreateUserDto) => {
-  return instance.post("/api/users", data);
+export const getUserByIdService = async (id: string): Promise<IUser> => {
+  try {
+    const res = await instance.get<ApiResponse<IUser>>(
+      `${EUserApi.BASE}/${id}`,
+    );
+
+    return res.data.data;
+  } catch (error) {
+    return throwServiceError(error);
+  }
 };
 
-export const updateUserApi = async (id: string, data: IUpdateUserDto) => {
-  return instance.put(`/api/users/${id}`, data);
+export const createUserService = async (
+  data: ICreateUserDto,
+): Promise<IUser> => {
+  try {
+    const res = await instance.post<ApiResponse<IUser>>(EUserApi.BASE, data);
+    console.log("create user called", res.data.data);
+    return res.data.data;
+  } catch (error) {
+    return throwServiceError(error);
+  }
 };
 
-export const deleteUserApi = async (id: string) => {
-  return instance.delete(`/api/users/${id}`);
+export const updateUserService = async (
+  id: string,
+  data: IUpdateUserDto,
+): Promise<IUser> => {
+  try {
+    const res = await instance.put<ApiResponse<IUser>>(
+      `${EUserApi.BASE}/${id}`,
+      data,
+    );
+
+    return res.data.data;
+  } catch (error) {
+    return throwServiceError(error);
+  }
+};
+
+export const deleteUserService = async (id: string): Promise<void> => {
+  try {
+    await instance.delete(`${EUserApi.BASE}/${id}`);
+  } catch (error) {
+    return throwServiceError(error);
+  }
 };

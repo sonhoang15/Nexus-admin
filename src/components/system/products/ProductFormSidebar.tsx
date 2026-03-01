@@ -5,17 +5,26 @@ import {
   GlobeIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useMemo } from "react";
+import { calculateMargin } from "@/utils/priceHelpers";
+import { ProductStep } from "@/enums/product.enums";
 
 type Props = {
-  activeStep: "general" | "pricing" | "media" | "seo";
-  setActiveStep: (step: any) => void;
+  activeStep: ProductStep;
+  setActiveStep: (step: ProductStep) => void;
   errors: Record<string, string>;
+  formData: {
+    basePrice: number;
+    costPrice: number;
+    discountPrice?: number;
+  };
 };
 
 export function ProductFormSidebar({
   activeStep,
   setActiveStep,
   errors,
+  formData,
 }: Props) {
   const stepHasError = {
     general: ["name", "category", "brand"],
@@ -26,6 +35,14 @@ export function ProductFormSidebar({
 
   const hasError = (step: keyof typeof stepHasError) =>
     stepHasError[step].some((field) => errors[field]);
+
+  const margin = useMemo(() => {
+    return calculateMargin(
+      formData.basePrice,
+      formData.costPrice,
+      formData.discountPrice,
+    );
+  }, [formData]);
 
   return (
     <div className="col-span-3 space-y-3">
@@ -57,9 +74,15 @@ export function ProductFormSidebar({
         );
       })}
 
-      <div className="mt-6 p-6 bg-gray-100 rounded-lg text-center ">
+      <div className="mt-6 p-6 bg-gray-100 rounded-lg text-center">
         <div className="text-xs text-gray-500">EST. MARGIN</div>
-        <div className="text-xl font-bold text-red-500">0%</div>
+        <div
+          className={`text-xl font-bold ${
+            margin > 20 ? "text-green-600" : "text-red-500"
+          }`}
+        >
+          {margin.toFixed(1)}%
+        </div>
       </div>
     </div>
   );

@@ -6,12 +6,13 @@ interface ISettingsTableProps {
   settings: ISetting[];
   onEdit: (setting: ISetting) => void;
   onDelete: (id: string) => void;
+  deletingId?: string | null;
 }
-
 export function SettingsTable({
   settings,
   onEdit,
   onDelete,
+  deletingId,
 }: ISettingsTableProps) {
   return (
     <div className="bg-card rounded-lg border overflow-x-auto shadow-md shadow-black/10">
@@ -46,10 +47,14 @@ export function SettingsTable({
                   <Button
                     variant="ghost"
                     size="icon"
+                    disabled={deletingId === s.id}
                     onClick={() => onDelete(s.id)}
-                    className=" text-red-500 hover:bg-red-600"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    {deletingId === s.id ? (
+                      "..."
+                    ) : (
+                      <Trash2 className="h-4 w-4" />
+                    )}
                   </Button>
                 </div>
               </td>

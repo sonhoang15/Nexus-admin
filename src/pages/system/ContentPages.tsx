@@ -3,6 +3,7 @@ import { ContentsEditor } from "@/components/system/contents/ContentsForm";
 import { ContentPagesHeader } from "@/components/system/contents/ContentPagesHeader";
 import { ContentToolbar } from "@/components/system/contents/ContentToolbar";
 import { useContentPages } from "@/hooks/useContentPages";
+import { ConfirmDeleteModal } from "@/components/common/ConfirmDeleteModal";
 
 export default function ContentPagesPage() {
   const {
@@ -12,6 +13,8 @@ export default function ContentPagesPage() {
     editingPage,
     formData,
     submitting,
+    deletingPage,
+    isDeleting,
 
     setSearch,
     setFormData,
@@ -21,6 +24,8 @@ export default function ContentPagesPage() {
     handleDelete,
     handleSubmit,
     handleCancel,
+    confirmDelete,
+    cancelDelete,
   } = useContentPages();
 
   return (
@@ -55,6 +60,15 @@ export default function ContentPagesPage() {
         onSubmit={handleSubmit}
         submitting={submitting}
         onClose={handleCancel}
+      />
+
+      <ConfirmDeleteModal
+        open={!!deletingPage}
+        loading={isDeleting}
+        entityName="page"
+        itemName={deletingPage?.title}
+        onConfirm={confirmDelete}
+        onCancel={cancelDelete}
       />
     </div>
   );

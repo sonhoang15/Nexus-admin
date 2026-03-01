@@ -4,7 +4,7 @@ import { IProduct } from "@/types/product";
 import { Button } from "@/components/ui/button";
 import { Eye, Pencil, Trash2, Star } from "lucide-react";
 import { cn } from "@/libs/utils";
-import { API_BASE } from "@/utils/productHelpers";
+import { API_BASE, getStockStatus } from "@/utils/productHelpers";
 
 type Props = {
   product: IProduct;
@@ -14,6 +14,7 @@ type Props = {
 };
 
 export function ProductCard({ product, onView, onEdit, onDelete }: Props) {
+  const status = getStockStatus(product);
   return (
     <Card className="relative overflow-hidden group transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.15)]">
       <div className="relative aspect-video bg-muted overflow-hidden">
@@ -36,11 +37,7 @@ export function ProductCard({ product, onView, onEdit, onDelete }: Props) {
         )}
       </div>
 
-      <StockBadge
-        stockUnits={product.stockUnits}
-        lowStockAlert={product.lowStockAlert ?? 10}
-      />
-
+      <StockBadge label={status.label} variant={status.variant} />
       <CardContent className="p-4">
         <p className="text-xs text-primary uppercase font-medium">
           {product.category?.name}

@@ -10,8 +10,13 @@ import {
   Trash,
   Info,
   Star,
+  DollarSign,
+  Package,
+  HardDrive,
+  Globe,
 } from "lucide-react";
 import { API_BASE } from "@/utils/productHelpers";
+import { calculateMargin } from "@/utils/priceHelpers";
 
 export function ProductDetail({
   open,
@@ -24,11 +29,11 @@ export function ProductDetail({
   productId: string;
   onClose: () => void;
   onDeleted?: () => void;
-  onEdit?: () => void;
+  onEdit: (product: IProduct) => void;
 }) {
   const [product, setProduct] = useState<IProduct | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [deleting, setDeleting] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [deleting, setDeleting] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -94,15 +99,40 @@ export function ProductDetail({
 
   if (!product) return null;
 
+  const basePrice = Number(product.basePrice) || 0;
+  const discountPrice = Number(product.discountPrice) || 0;
+
+  const finalPrice =
+    discountPrice > 0 && discountPrice < basePrice ? discountPrice : basePrice;
+
+  const showOriginal = discountPrice > 0 && discountPrice < basePrice;
+
+  const margin = calculateMargin(
+    product.basePrice,
+    product.costPrice || 0,
+    product.discountPrice || 0,
+  );
+
+  const lowStockAlert = product.lowStockAlert ?? 0;
+  const stockUnits = product.stockUnits ?? 0;
+
   return (
     <div className="mt-6 space-y-8">
       <div className="flex items-center justify-between">
         <Button
           onClick={onClose}
           variant="ghost"
-          className="flex items-center space-x-2 text-slate-500 !hover:text-indigo-600 font-bold transition-colors group"
+          className="group flex items-center gap-3 
+             !text-indigo-600 font-semibold 
+             !hover:bg-transparent"
         >
-          <div className="p-2 bg-white border border-slate-200 rounded-xl group-hover:border-indigo-200 group-hover:bg-indigo-50 transition-all">
+          <div
+            className="p-2 bg-white border border-slate-200 
+               rounded-xl 
+               transition-all
+               !group-hover:border-indigo-200 
+               !group-hover:bg-indigo-50"
+          >
             <ArrowLeft className="w-4 h-4" />
           </div>
           Back to Inventory
@@ -110,7 +140,7 @@ export function ProductDetail({
 
         <div className="flex items-center gap-3">
           <Button
-            onClick={onEdit}
+            onClick={() => onEdit(product)}
             className="px-6 py-3 rounded-xl shadow-sm border bg-white text-gray-700 hover:bg-gray-500"
           >
             <Pencil className="mr-2 w-4 h-4" />
@@ -269,18 +299,37 @@ export function ProductDetail({
 
           <div className="grid md:grid-cols-2 gap-6">
             <div className="rounded-3xl p-8 text-white shadow-lg bg-gradient-to-br from-indigo-500 to-purple-600 space-y-6">
-              <p className="uppercase text-sm tracking-wider opacity-80">
-                Revenue Analysis
-              </p>
+              <div className="flex items-center gap-2 uppercase text-sm tracking-wider opacity-80">
+                <DollarSign className="w-4 h-4 opacity-80" />
+                <span>Revenue Analysis</span>
+              </div>
 
-              <h3 className="text-5xl font-bold">
-                ${product.costPrice?.toLocaleString()}
-              </h3>
+              <div>
+                <h3 className="text-5xl font-bold">
+                  ${finalPrice.toLocaleString()}
+                </h3>
+
+                {showOriginal && (
+                  <p className="text-sm opacity-70 line-through mt-2">
+                    Originally ${basePrice.toLocaleString()}
+                  </p>
+                )}
+              </div>
 
               <div className="bg-white/10 rounded-2xl p-6 flex justify-between text-sm">
                 <div>
                   <p className="opacity-70">Gross Margin</p>
-                  <p className="text-xl font-semibold">19.5%</p>
+                  <p
+                    className={`text-xl font-semibold ${
+                      margin > 20
+                        ? "text-green-300"
+                        : margin > 0
+                          ? "text-yellow-300"
+                          : "text-red-300"
+                    }`}
+                  >
+                    {margin.toFixed(1)}%
+                  </p>
                 </div>
 
                 <div>
@@ -292,43 +341,75 @@ export function ProductDetail({
               </div>
             </div>
 
-            <div className="bg-white rounded-3xl p-8 shadow-sm space-y-6">
-              <p className="uppercase text-sm tracking-wide text-muted-foreground">
-                Stock Health
-              </p>
-
-              <div className="text-6xl font-bold">
-                {product.stockUnits || 0}
-              </div>
-              <p className="text-muted-foreground">Units Currently On-Hand</p>
-
-              <div>
-                <div className="flex justify-between text-sm mb-2">
-                  <span>Inventory Level</span>
-                  <span className="text-indigo-600 font-semibold">Healthy</span>
-                </div>
-                <div className="w-full h-2 bg-gray-200 rounded-full">
-                  <div className="w-4/5 h-2 bg-indigo-600 rounded-full"></div>
-                </div>
+            <div className="bg-white rounded-3xl p-8 shadow-sm space-y-8">
+              <div className="flex items-center gap-2 uppercase text-sm tracking-widest text-slate-400 font-semibold">
+                <Package className="w-4 h-4 opacity-70" />
+                <span>Stock Health</span>
               </div>
 
-              <p className="text-sm text-muted-foreground">
-                Alert Threshold: 10 units
+              <div className="text-6xl font-bold text-slate-900">
+                {stockUnits}
+              </div>
+
+              <p className="uppercase text-xs tracking-widest text-slate-400 font-semibold">
+                Units Currently On-Hand
               </p>
+
+              <div className="space-y-3 pt-4">
+                <div className="flex justify-between text-xs uppercase tracking-widest font-semibold">
+                  <span className="text-slate-400">Inventory Level</span>
+                  <span
+                    className={`${
+                      stockUnits <= lowStockAlert
+                        ? "text-red-500"
+                        : "text-indigo-600"
+                    }`}
+                  >
+                    {stockUnits <= lowStockAlert ? "Low" : "Healthy"}
+                  </span>
+                </div>
+
+                <div className="w-full h-3 bg-slate-200 rounded-full overflow-hidden">
+                  <div
+                    className={`h-3 rounded-full transition-all duration-500 ${
+                      stockUnits <= lowStockAlert
+                        ? "bg-red-500"
+                        : "bg-gradient-to-r from-indigo-500 to-purple-500"
+                    }`}
+                    style={{
+                      width: `${Math.min(
+                        (stockUnits / (lowStockAlert || 1)) * 100,
+                        100,
+                      )}%`,
+                    }}
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-between items-center pt-4">
+                <span className="uppercase text-xs tracking-widest text-slate-400 font-semibold">
+                  Alert Threshold
+                </span>
+                <span className="text-sm font-bold text-slate-900">
+                  {lowStockAlert} units
+                </span>
+              </div>
             </div>
           </div>
 
           <div className="bg-white rounded-3xl p-8 shadow-sm space-y-4">
-            <h3 className="uppercase text-sm tracking-wide text-muted-foreground">
-              Product Overview
-            </h3>
+            <div className="flex items-center gap-2 uppercase text-sm tracking-wide text-muted-foreground">
+              <HardDrive className="w-4 h-4 opacity-70" />
+              <span>Product Overview</span>
+            </div>
             <p className="text-lg">{product.description}</p>
           </div>
 
           <div className="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-3xl p-8 space-y-6">
-            <h3 className="uppercase text-sm tracking-wide opacity-70">
-              SEO Performance
-            </h3>
+            <div className="flex items-center gap-2 uppercase text-sm tracking-widest text-slate-400 font-semibold">
+              <Globe className="w-4 h-4 opacity-70" />
+              <span>SEO</span>
+            </div>
 
             <div className="bg-white/5 p-6 rounded-2xl">
               <p className="text-sm uppercase opacity-50">

@@ -12,16 +12,19 @@ type ViewMode = "table" | "form";
 
 export const useCategories = () => {
   const [categories, setCategories] = useState<ICategory[]>([]);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState<string>("");
   const [viewMode, setViewMode] = useState<ViewMode>("table");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [editingCategory, setEditingCategory] = useState<ICategory | null>(
     null,
   );
   const [deleteCategoryId, setDeleteCategoryId] = useState<string | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    name: string;
+    description: string;
+  }>({
     name: "",
     description: "",
   });
@@ -42,9 +45,14 @@ export const useCategories = () => {
     fetchCategories();
   }, []);
 
-  const filteredCategories = categories.filter((category) =>
-    category.name.toLowerCase().includes(search.toLowerCase()),
-  );
+  const filteredCategories = categories.filter((category) => {
+    const keyword = search.trim().toLowerCase();
+    if (!keyword) return true;
+
+    return [category.name, category.description]
+      .filter(Boolean)
+      .some((field) => field!.toLowerCase().includes(keyword));
+  });
 
   const handleAdd = () => {
     setEditingCategory(null);
@@ -99,8 +107,8 @@ export const useCategories = () => {
       } else {
         const res = await createCategoryService(formData);
 
-        if (res.data) {
-          setCategories((prev) => [res.data, ...prev]);
+        if (res) {
+          setCategories((prev) => [res, ...prev]);
         } else {
           await fetchCategories();
         }

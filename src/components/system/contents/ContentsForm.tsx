@@ -2,11 +2,12 @@ import { IPage, TPageStatus } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/libs/utils";
 import { X, FileText, Image as ImageIcon, Upload } from "lucide-react";
 import { useEffect, useState } from "react";
 import { API_BASE } from "@/utils/productHelpers";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 
 type Props = {
   open: boolean;
@@ -36,6 +37,20 @@ export function ContentsEditor({
 }: Props) {
   if (!open) return null;
   const [preview, setPreview] = useState<string | null>(null);
+  const [slugManuallyEdited, setSlugManuallyEdited] = useState<boolean>(false);
+  const [titleError, setTitleError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!slugManuallyEdited) {
+      const generatedSlug = formData.title
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, "-")
+        .replace(/[^a-z0-9-]/g, "");
+
+      onChange({ ...formData, slug: generatedSlug });
+    }
+  }, [formData.title]);
 
   useEffect(() => {
     if (formData.featuredImage) {
@@ -52,6 +67,32 @@ export function ContentsEditor({
     }
   }, [editingPage]);
 
+  const handleSubmitLocal = () => {
+    if (!formData.title.trim()) {
+      setTitleError("Title is required.");
+      return;
+    }
+
+    setTitleError(null);
+    onSubmit();
+  };
+
+  const isContentEmpty = (html: string) => {
+    if (!html) return true;
+
+    const stripped = html
+      .replace(/<(.|\n)*?>/g, "") // remove HTML tags
+      .replace(/&nbsp;/g, "")
+      .trim();
+
+    return stripped.length === 0;
+  };
+
+  const isFormInvalid =
+    submitting ||
+    !formData.title.trim() ||
+    !formData.slug.trim() ||
+    isContentEmpty(formData.content);
   return (
     <div className="rounded-2xl border bg-background shadow-md shadow-black/10">
       <div className="flex items-start justify-between px-6 py-5 border-b">
@@ -86,23 +127,62 @@ export function ContentsEditor({
             <Label>Page title</Label>
             <Input
               value={formData.title}
-              onChange={(e) => onChange({ ...formData, title: e.target.value })}
+              onChange={(e) => {
+                setTitleError(null);
+                onChange({ ...formData, title: e.target.value });
+              }}
+              className={
+                titleError ? "border-red-500 focus-visible:ring-red-500" : ""
+              }
             />
+
+            {titleError && (
+              <p className="text-xs text-red-500 mt-1">{titleError}</p>
+            )}
           </div>
 
           <div>
-            <Label>Content</Label>
-            <Textarea
-              value={formData.content}
-              onChange={(e) =>
-                onChange({ ...formData, content: e.target.value })
-              }
-              className="min-h-[420px]"
-            />
+            <Label>Content (HTML supported)</Label>
+
+            <div className="rounded-xl border bg-white overflow-hidden [&_.ql-toolbar]:border-0 [&_.ql-toolbar]:border-b [&_.ql-toolbar]:border-border [&_.ql-container]:border-0 [&_.ql-container]:h-[420px] [&_.ql-editor]:min-h-[420px] [&_.ql-editor]:p-4 [&_.ql-editor]:text-sm ">
+              <ReactQuill
+                theme="snow"
+                value={formData.content}
+                onChange={(value) => onChange({ ...formData, content: value })}
+              />
+            </div>
           </div>
         </div>
 
         <div className="space-y-6">
+          <div className="rounded-xl border p-4 space-y-4">
+            <Label className="text-sm font-semibold uppercase tracking-wide">
+              Publishing Details
+            </Label>
+
+            <div>
+              <Label className="text-xs text-muted-foreground">
+                Permanent URL Slug
+              </Label>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-sm text-muted-foreground">/pages/</span>
+                <Input
+                  value={formData.slug}
+                  onChange={(e) => {
+                    setSlugManuallyEdited(true);
+
+                    onChange({
+                      ...formData,
+                      slug: e.target.value
+                        .toLowerCase()
+                        .replace(/\s+/g, "-")
+                        .replace(/[^a-z0-9-]/g, ""),
+                    });
+                  }}
+                />
+              </div>
+            </div>
+          </div>
           <div className="rounded-xl border p-4 space-y-4">
             <Label>Status</Label>
 
@@ -193,8 +273,8 @@ export function ContentsEditor({
         </Button>
 
         <Button
-          onClick={onSubmit}
-          disabled={submitting}
+          onClick={handleSubmitLocal}
+          disabled={isFormInvalid}
           className="bg-blue-500 text-white hover:bg-blue-700"
         >
           {submitting

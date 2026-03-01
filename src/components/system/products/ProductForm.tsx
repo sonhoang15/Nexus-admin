@@ -5,13 +5,14 @@ import { ProductFormSidebar } from "./ProductFormSidebar";
 import { GeneralStep } from "@/components/system/products/steps/GeneralStep";
 import { PricingStep } from "@/components/system/products/steps/PricingStep";
 import {
-  ImageItem,
+  TImageItem,
   MediaStep,
 } from "@/components/system/products/steps/MediaStep";
 import { SeoStep } from "@/components/system/products/steps/SeoStep";
 import { Package } from "lucide-react";
 import { useMemo } from "react";
 import { TProductFormData } from "@/types/product";
+import { ProductStep } from "@/enums/product.enums";
 
 type Props = {
   editingProduct: boolean;
@@ -39,9 +40,9 @@ export function ProductForm({
   handleRemoveTag,
   handleRemoveImage,
 }: Props) {
-  const [activeStep, setActiveStep] = useState<
-    "general" | "pricing" | "media" | "seo"
-  >("general");
+  const [activeStep, setActiveStep] = useState<ProductStep>(
+    ProductStep.GENERAL,
+  );
 
   const { categories } = useCategoryOptions();
 
@@ -49,6 +50,7 @@ export function ProductForm({
     const newErrors: Record<string, string> = {};
     const base = Number(formData.basePrice);
     const cost = Number(formData.costPrice);
+    const discount = Number(formData.discountPrice);
 
     if (!formData?.name?.trim()) {
       newErrors.name = "Product name is required";
@@ -92,8 +94,26 @@ export function ProductForm({
       newErrors.costPrice = "Cost must be lower than Base Price";
     }
 
-    if (!formData?.stockUnits || formData.stockUnits <= 0) {
-      newErrors.stockUnits = "Stock units must be greater than 0";
+    if (
+      formData.discountPrice !== undefined &&
+      formData.discountPrice !== null &&
+      discount > 0
+    ) {
+      if (discount >= base) {
+        newErrors.discountPrice =
+          "Discount price must be lower than Base Price";
+      } else if (discount <= cost) {
+        newErrors.discountPrice =
+          "Discount price must be greater than Cost Price";
+      }
+    }
+
+    if (
+      formData.stockUnits === undefined ||
+      formData.stockUnits === null ||
+      formData.stockUnits < 0
+    ) {
+      newErrors.stockUnits = "Stock units cannot be negative";
     }
 
     if (!formData?.images || formData.images.length < 1) {
@@ -122,7 +142,8 @@ export function ProductForm({
       </div>
       <div className="grid grid-cols-12 gap-6">
         <ProductFormSidebar
-          activeStep={activeStep}
+          formData={formData}
+          activeStep={ProductStep.GENERAL}
           setActiveStep={setActiveStep}
           errors={errors}
         />
@@ -153,7 +174,7 @@ export function ProductForm({
             <MediaStep
               errors={errors}
               images={formData?.images}
-              setImages={(files: ImageItem[]) =>
+              setImages={(files: TImageItem[]) =>
                 setFormData({ ...formData, images: files })
               }
               onRemoveImage={handleRemoveImage}

@@ -7,6 +7,8 @@ import {
   TProductFilters,
   TProductFormData,
 } from "@/types";
+import { throwServiceError } from "@/utils/errorServiceHelper";
+import { EProductApi } from "@/enums/service.enums";
 
 const buildFormData = (
   data: ICreateProductDto | IUpdateProductDto,
@@ -24,9 +26,7 @@ const buildFormData = (
           formData.append(`${key}[]`, item);
         }
       });
-    } else if (typeof value === "boolean") {
-      formData.append(key, String(value));
-    } else if (typeof value === "number") {
+    } else if (typeof value === "boolean" || typeof value === "number") {
       formData.append(key, String(value));
     } else {
       formData.append(key, value as string);
@@ -36,75 +36,144 @@ const buildFormData = (
   return formData;
 };
 
+export interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+}
+
 export const getProducts = async (
   params?: Partial<TProductFilters> & {
     page?: number;
     limit?: number;
   },
 ): Promise<IProductListResponse> => {
-  return instance.get("/api/products", { params });
+  try {
+    const { data } = await instance.get<ApiResponse<IProductListResponse>>(
+      EProductApi.BASE,
+      { params },
+    );
+
+    return data.data;
+  } catch (error) {
+    return throwServiceError(error);
+  }
 };
 
 export const getProductById = async (id: string): Promise<IProduct> => {
-  return instance.get(`/api/products/${id}`);
+  try {
+    const { data } = await instance.get<ApiResponse<IProduct>>(
+      `${EProductApi.BASE}/${id}`,
+    );
+
+    return data.data;
+  } catch (error) {
+    return throwServiceError(error);
+  }
 };
 
 export const createProduct = async (
-  data: TProductFormData,
+  payload: TProductFormData,
 ): Promise<IProduct> => {
-  const formData = new FormData();
-  Object.entries(data).forEach(([key, value]) => {
-    if (key !== "images") {
+  try {
+    const formData = new FormData();
+
+    Object.entries(payload).forEach(([key, value]) => {
+      if (key === "images") return;
+      if (value === undefined || value === null) return;
+
       if (Array.isArray(value)) {
-        value.forEach((v) => formData.append(key, v));
+        value.forEach((v) => {
+          formData.append(`${key}[]`, v);
+        });
+      } else if (typeof value === "boolean" || typeof value === "number") {
+        formData.append(key, String(value));
       } else {
-        formData.append(key, String(value ?? ""));
+        formData.append(key, value as string);
       }
-    }
-  });
-  data.images
-    .filter((img) => img.type === "new")
-    .forEach((img) => {
-      formData.append("images", img.file);
     });
 
-  return instance.post("/api/products", formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
+    payload.images
+      .filter((img) => img.type === "new")
+      .forEach((img) => {
+        formData.append("images", img.file);
+      });
+
+    const { data } = await instance.post<ApiResponse<IProduct>>(
+      EProductApi.BASE,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      },
+    );
+
+    return data.data;
+  } catch (error) {
+    return throwServiceError(error);
+  }
 };
 
 export const updateProduct = async (
   id: string,
-  data: IUpdateProductDto,
+  payload: IUpdateProductDto,
 ): Promise<IProduct> => {
-  const formData = buildFormData(data);
+  try {
+    const formData = buildFormData(payload);
 
-  return instance.put(`/api/products/${id}`, formData);
+    const { data } = await instance.put<ApiResponse<IProduct>>(
+      `${EProductApi.BASE}/${id}`,
+      formData,
+    );
+
+    return data.data;
+  } catch (error) {
+    return throwServiceError(error);
+  }
 };
 
 export const deleteProduct = async (id: string): Promise<void> => {
-  return instance.delete(`/api/products/${id}`);
+  try {
+    await instance.delete(`${EProductApi.BASE}/${id}`);
+  } catch (error) {
+    return throwServiceError(error);
+  }
 };
 
-export const uploadProductImages = async (productId: string, files: File[]) => {
-  const formData = new FormData();
+export const uploadProductImages = async (
+  productId: string,
+  files: File[],
+): Promise<IProduct> => {
+  try {
+    const formData = new FormData();
 
-  files.forEach((file) => {
-    formData.append("images", file);
-  });
+    files.forEach((file) => {
+      formData.append("images", file);
+    });
 
-  return instance.post(`/api/products/${productId}/images`, formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
+    const { data } = await instance.post<ApiResponse<IProduct>>(
+      `${EProductApi.BASE}/${productId}/images`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      },
+    );
+
+    return data.data;
+  } catch (error) {
+    return throwServiceError(error);
+  }
 };
 
 export const deleteProductImage = async (
   productId: string,
   imageId: string,
 ): Promise<void> => {
-  return instance.delete(`/api/products/${productId}/images/${imageId}`);
+  try {
+    await instance.delete(`${EProductApi.BASE}/${productId}/images/${imageId}`);
+  } catch (error) {
+    return throwServiceError(error);
+  }
 };

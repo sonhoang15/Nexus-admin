@@ -1,20 +1,49 @@
-import { useState } from "react";
-import { mockSettings } from "@/data/mockData";
-import { ISetting } from "@/types";
+import { useEffect, useState } from "react";
+import {
+  getSettingsService,
+  createSettingService,
+  updateSettingService,
+  deleteSettingService,
+} from "@/services/SettingService";
+import { ISetting, CreateSettingDto, IUpdateSettingDto } from "@/types";
 
 type ViewMode = "table" | "form";
 
 export function useSettings() {
-  const [settings, setSettings] = useState<ISetting[]>(mockSettings);
-  const [search, setSearch] = useState("");
+  const [settings, setSettings] = useState<ISetting[]>([]);
+  const [search, setSearch] = useState<string>("");
   const [viewMode, setViewMode] = useState<ViewMode>("table");
   const [editingSetting, setEditingSetting] = useState<ISetting | null>(null);
 
-  const filteredSettings = settings.filter(
-    (s) =>
-      s.configKey.toLowerCase().includes(search.toLowerCase()) ||
-      s.description.toLowerCase().includes(search.toLowerCase()),
-  );
+  const [loading, setLoading] = useState<boolean>(false);
+  const [submitting, setSubmitting] = useState<boolean>(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+
+  const fetchSettings = async () => {
+    try {
+      setLoading(true);
+      const res = await getSettingsService();
+      setSettings(res.data.items || []);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchSettings();
+  }, []);
+
+  const filteredSettings = settings.filter((s) => {
+    const keyword = search.trim().toLowerCase();
+    if (!keyword) return true;
+
+    return [s.configKey, s.description]
+      .filter(Boolean)
+      .some((field) => field!.toLowerCase().includes(keyword));
+  });
 
   const handleAdd = () => {
     setEditingSetting(null);
@@ -27,43 +56,54 @@ export function useSettings() {
   };
 
   const handleDelete = (id: string) => {
-    setSettings(settings.filter((s) => s.id !== id));
+    setConfirmDeleteId(id);
   };
 
-  const handleSubmit = (payload: {
-    configKey: string;
-    description: string;
-    configData: any;
-  }) => {
-    const today = new Date().toISOString().split("T")[0];
+  const confirmDelete = async () => {
+    if (!confirmDeleteId) return;
 
-    if (editingSetting) {
-      setSettings(
-        settings.map((s) =>
-          s.id === editingSetting.id
-            ? {
-                ...s,
-                description: payload.description,
-                configData: payload.configData,
-                updatedAt: today,
-              }
-            : s,
-        ),
-      );
-    } else {
-      setSettings([
-        ...settings,
-        {
-          id: Date.now().toString(),
-          ...payload,
-          createdAt: today,
-          updatedAt: today,
-        },
-      ]);
+    try {
+      setDeletingId(confirmDeleteId); // row loading
+
+      await deleteSettingService(confirmDeleteId);
+
+      setSettings((prev) => prev.filter((s) => s.id !== confirmDeleteId));
+
+      setConfirmDeleteId(null);
+    } catch (error) {
+      console.error("Delete failed:", error);
+    } finally {
+      setDeletingId(null);
     }
+  };
 
-    setEditingSetting(null);
-    setViewMode("table");
+  const cancelDelete = () => {
+    setConfirmDeleteId(null);
+  };
+
+  const handleSubmit = async (
+    payload: CreateSettingDto | IUpdateSettingDto,
+  ) => {
+    try {
+      setSubmitting(true);
+
+      if (editingSetting) {
+        const updated = await updateSettingService(editingSetting.id, payload);
+
+        setSettings((prev) =>
+          prev.map((s) => (s.id === updated.data.id ? updated.data : s)),
+        );
+      } else {
+        const created = await createSettingService(payload as CreateSettingDto);
+
+        setSettings((prev) => [created.data, ...prev]);
+      }
+
+      setEditingSetting(null);
+      setViewMode("table");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleCancel = () => {
@@ -73,16 +113,21 @@ export function useSettings() {
 
   return {
     settings: filteredSettings,
+    loading,
+    submitting,
+    deletingId,
     search,
     viewMode,
     editingSetting,
+    confirmDeleteId,
 
     setSearch,
-
     handleAdd,
     handleEdit,
     handleDelete,
     handleSubmit,
     handleCancel,
+    confirmDelete,
+    cancelDelete,
   };
 }

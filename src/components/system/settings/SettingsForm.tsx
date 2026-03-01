@@ -5,28 +5,32 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Info, Terminal } from "lucide-react";
+import { CreateSettingDto, IUpdateSettingDto } from "@/types";
 
 interface ISettingsFormProps {
   setting: ISetting | null;
   onCancel: () => void;
-  onSubmit: (payload: {
-    configKey: string;
-    description: string;
-    configData: any;
-  }) => void;
+  onSubmit: (payload: CreateSettingDto | IUpdateSettingDto) => void;
+  submitting?: boolean;
 }
 
 export function SettingsForm({
   setting,
   onCancel,
   onSubmit,
+  submitting,
 }: ISettingsFormProps) {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    configKey: string;
+    description: string;
+    configData: string;
+  }>({
     configKey: "",
     description: "",
     configData: "{\n  \n}",
   });
-  const [jsonError, setJsonError] = useState("");
+
+  const [jsonError, setJsonError] = useState<string | null>(null);
 
   useEffect(() => {
     if (setting) {
@@ -42,29 +46,65 @@ export function SettingsForm({
         configData: "{\n  \n}",
       });
     }
+
     setJsonError("");
   }, [setting]);
 
-  const validateJson = (value: string) => {
+  // Strict JSON validation (không thay đổi logic chính)
+  const validateJson = (value: string): { valid: boolean; parsed?: any } => {
+    if (!value.trim()) {
+      setJsonError("JSON content is required");
+      return { valid: false };
+    }
+
     try {
-      JSON.parse(value);
+      const parsed = JSON.parse(value);
+
+      // Optional strict rule: phải là object
+      if (typeof parsed !== "object" || parsed === null) {
+        setJsonError("JSON must be a valid object");
+        return { valid: false };
+      }
+
       setJsonError("");
-      return true;
+      return { valid: true, parsed };
     } catch {
       setJsonError("Invalid JSON format");
-      return false;
+      return { valid: false };
     }
   };
 
   const handleSubmit = () => {
-    if (!validateJson(formData.configData)) return;
+    const result = validateJson(formData.configData);
 
-    onSubmit({
-      configKey: formData.configKey,
-      description: formData.description,
-      configData: JSON.parse(formData.configData),
-    });
+    if (!result.valid) return;
+
+    const parsed = result.parsed;
+
+    if (setting) {
+      const payload: IUpdateSettingDto = {
+        description: formData.description,
+        configData: parsed,
+      };
+
+      onSubmit(payload);
+    } else {
+      const payload: CreateSettingDto = {
+        configKey: formData.configKey,
+        description: formData.description,
+        configData: parsed,
+      };
+
+      onSubmit(payload);
+    }
   };
+
+  const isFormInvalid =
+    submitting ||
+    !!jsonError ||
+    !formData.description.trim() ||
+    !formData.configData.trim() ||
+    (!setting && !formData.configKey.trim());
 
   return (
     <div className="bg-card border rounded-lg p-6 space-y-6 shadow-md shadow-black/10">
@@ -106,11 +146,15 @@ export function SettingsForm({
           <Textarea
             value={formData.configData}
             onChange={(e) => {
-              setFormData({ ...formData, configData: e.target.value });
-              validateJson(e.target.value);
+              const value = e.target.value;
+              setFormData({ ...formData, configData: value });
+              validateJson(value);
             }}
-            className="font-mono min-h-[200px]"
+            className={`font-mono min-h-[200px] ${
+              jsonError ? "border-red-500 focus-visible:ring-red-500" : ""
+            }`}
           />
+
           {jsonError && (
             <p className="text-xs text-destructive mt-1">{jsonError}</p>
           )}
@@ -134,11 +178,17 @@ export function SettingsForm({
         >
           Cancel
         </Button>
+
         <Button
           onClick={handleSubmit}
+          disabled={isFormInvalid}
           className="bg-green-500 text-white hover:bg-green-600"
         >
-          {setting ? "Update Config" : "Create Setting"}
+          {submitting
+            ? "Processing..."
+            : setting
+              ? "Update Config"
+              : "Create Setting"}
         </Button>
       </div>
     </div>

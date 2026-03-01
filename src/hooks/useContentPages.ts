@@ -1,5 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-import { pageService } from "@/services/PagesService";
+import {
+  getPagesService,
+  getPageByIdService,
+  createPageService,
+  updatePageService,
+  deletePageService,
+} from "@/services/PagesService";
 import { IPage, TPageStatus } from "@/types";
 
 type ViewMode = "table" | "form";
@@ -17,11 +23,11 @@ const mapToIPage = (data: any): IPage => ({
 
 export const useContentPages = () => {
   const [pages, setPages] = useState<IPage[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState<boolean>(false);
+  const [search, setSearch] = useState<string>("");
   const [viewMode, setViewMode] = useState<ViewMode>("table");
   const [editingPage, setEditingPage] = useState<IPage | null>(null);
-  const [submitting, setSubmitting] = useState(false);
+  const [submitting, setSubmitting] = useState<boolean>(false);
 
   const [formData, setFormData] = useState<{
     title: string;
@@ -36,10 +42,13 @@ export const useContentPages = () => {
     status: "DRAFT",
   });
 
+  const [deletingPage, setDeletingPage] = useState<IPage | null>(null);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
+
   const fetchPages = async () => {
     try {
       setLoading(true);
-      const res = await pageService.getAll();
+      const res = await getPagesService();
       setPages(res.map(mapToIPage));
     } finally {
       setLoading(false);
@@ -51,10 +60,13 @@ export const useContentPages = () => {
   }, []);
 
   const filteredPages = useMemo(() => {
-    const q = search.toLowerCase();
-    return pages.filter(
-      (p) =>
-        p.title.toLowerCase().includes(q) || p.slug.toLowerCase().includes(q),
+    const keyword = search.trim().toLowerCase();
+    if (!keyword) return pages;
+
+    return pages.filter((p) =>
+      [p.title, p.slug]
+        .filter(Boolean)
+        .some((field) => field!.toLowerCase().includes(keyword)),
     );
   }, [pages, search]);
 
@@ -69,9 +81,24 @@ export const useContentPages = () => {
     setViewMode("form");
   };
 
+  useEffect(() => {
+    if (!editingPage) {
+      const generatedSlug = formData.title
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, "-")
+        .replace(/[^a-z0-9-]/g, "");
+
+      setFormData((prev) => ({
+        ...prev,
+        slug: generatedSlug,
+      }));
+    }
+  }, [formData.title, editingPage]);
+
   const handleEdit = async (page: IPage) => {
     try {
-      const detail = await pageService.getById(page.id);
+      const detail = await getPageByIdService(page.id);
 
       setEditingPage(detail);
 
@@ -87,9 +114,31 @@ export const useContentPages = () => {
       console.error("Failed to fetch page detail:", error);
     }
   };
-  const handleDelete = async (id: string) => {
-    await pageService.delete(id);
-    setPages((prev) => prev.filter((p) => p.id !== id));
+
+  const handleDelete = (id: string) => {
+    setDeletingPage(pages.find((p) => p.id === id) || null);
+  };
+
+  const confirmDelete = async () => {
+    if (!deletingPage) return;
+
+    try {
+      setIsDeleting(true);
+
+      await deletePageService(deletingPage.id);
+
+      setPages((prev) => prev.filter((p) => p.id !== deletingPage.id));
+
+      setDeletingPage(null);
+    } catch (error) {
+      console.error("Delete failed:", error);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const cancelDelete = () => {
+    setDeletingPage(null);
   };
 
   const handleSubmit = async () => {
@@ -97,7 +146,7 @@ export const useContentPages = () => {
       setSubmitting(true);
 
       if (editingPage) {
-        const updated = await pageService.update(editingPage.id, {
+        const updated = await updatePageService(editingPage.id, {
           ...formData,
         });
 
@@ -105,7 +154,7 @@ export const useContentPages = () => {
           prev.map((p) => (p.id === editingPage.id ? mapToIPage(updated) : p)),
         );
       } else {
-        const created = await pageService.create({
+        const created = await createPageService({
           ...formData,
         });
 
@@ -132,6 +181,8 @@ export const useContentPages = () => {
     editingPage,
     formData,
     submitting,
+    deletingPage,
+    isDeleting,
 
     setSearch,
     setFormData,
@@ -141,5 +192,7 @@ export const useContentPages = () => {
     handleDelete,
     handleSubmit,
     handleCancel,
+    confirmDelete,
+    cancelDelete,
   };
 };

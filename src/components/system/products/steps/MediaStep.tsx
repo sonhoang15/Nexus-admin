@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { UploadIcon } from "lucide-react";
 import { API_BASE } from "@/utils/productHelpers";
 
-export type ImageItem =
+export type TImageItem =
   | {
       type: "old";
       id: string;
@@ -15,10 +15,10 @@ export type ImageItem =
     };
 
 type Props = {
-  images: ImageItem[];
-  setImages: (images: ImageItem[]) => void;
+  images: TImageItem[];
+  setImages: (images: TImageItem[]) => void;
   errors?: { images?: string };
-  onRemoveImage: (image: ImageItem) => void;
+  onRemoveImage: (image: TImageItem) => void;
 };
 
 export function MediaStep({ images, setImages, errors, onRemoveImage }: Props) {
@@ -27,7 +27,7 @@ export function MediaStep({ images, setImages, errors, onRemoveImage }: Props) {
   const handleFiles = (files: FileList | null) => {
     if (!files) return;
 
-    const fileArray: ImageItem[] = Array.from(files).map((file) => ({
+    const fileArray: TImageItem[] = Array.from(files).map((file) => ({
       type: "new",
       file,
     }));
@@ -35,7 +35,7 @@ export function MediaStep({ images, setImages, errors, onRemoveImage }: Props) {
     setImages([...images, ...fileArray]);
   };
 
-  const getImageSrc = (image: ImageItem) => {
+  const getImageSrc = (image: TImageItem) => {
     if (image.type === "old") {
       const src = `${API_BASE}${image.url}`;
       return src;

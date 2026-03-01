@@ -1,27 +1,28 @@
 import { useEffect, useState } from "react";
 import { IUser } from "@/types/user";
 import {
-  getUsersApi,
-  createUserApi,
-  updateUserApi,
-  deleteUserApi,
+  getUsersService,
+  createUserService,
+  updateUserService,
+  deleteUserService,
 } from "@/services/UsersService";
 import { toast } from "sonner";
+import { EUserRole, EUserStatus } from "@/enums/user.enums";
 
 export type TUserFormData = {
   fullName: string;
   email: string;
   password: string;
-  role: "ADMIN" | "SUPER_ADMIN";
-  status: "ACTIVE" | "INACTIVE";
+  role: EUserRole;
+  status: EUserStatus;
 };
 
 const DEFAULT_FORM: TUserFormData = {
   fullName: "",
   email: "",
   password: "",
-  role: "ADMIN",
-  status: "ACTIVE",
+  role: EUserRole.ADMIN,
+  status: EUserStatus.ACTIVE,
 };
 
 export function useUsers() {
@@ -31,22 +32,23 @@ export function useUsers() {
   const [editingUser, setEditingUser] = useState<IUser | null>(null);
   const [formData, setFormData] = useState<TUserFormData>(DEFAULT_FORM);
   const [deleteUserId, setDeleteUserId] = useState<string | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const res = await getUsersApi();
+      const res = await getUsersService();
       setUsers(res);
     };
 
     fetchUsers();
   }, []);
 
-  const filteredUsers = users.filter(
-    (u) =>
-      u.fullName.toLowerCase().includes(search.toLowerCase()) ||
-      u.email.toLowerCase().includes(search.toLowerCase()),
-  );
+  const filteredUsers = users.filter((u) => {
+    const keyword = search.trim().toLowerCase();
+    if (!keyword) return true;
+
+    return u.fullName?.toLowerCase().includes(keyword);
+  });
 
   const handleAdd = () => {
     setEditingUser(null);
@@ -60,8 +62,8 @@ export function useUsers() {
       fullName: user.fullName,
       email: user.email,
       password: "",
-      role: user.role,
-      status: user.status,
+      role: EUserRole[user.role],
+      status: EUserStatus[user.status],
     });
     setViewMode("form");
   };
@@ -75,7 +77,7 @@ export function useUsers() {
 
     try {
       setIsDeleting(true);
-      await deleteUserApi(deleteUserId);
+      await deleteUserService(deleteUserId);
 
       setUsers((prev) => prev.filter((u) => u.id !== deleteUserId));
       toast.success("Delete user successfully");
@@ -92,14 +94,14 @@ export function useUsers() {
 
   const handleSubmit = async () => {
     if (editingUser) {
-      await updateUserApi(editingUser.id, formData);
+      await updateUserService(editingUser.id, formData);
       setUsers((prev) =>
         prev.map((u) => (u.id === editingUser.id ? { ...u, ...formData } : u)),
       );
       toast.success("Update user successfully");
     } else {
-      const res = await createUserApi(formData);
-      setUsers((prev) => [...prev, res.data]);
+      const res = await createUserService(formData);
+      setUsers((prev) => [...prev, res]);
       toast.success("Create user successfully");
     }
 

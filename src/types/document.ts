@@ -15,6 +15,7 @@ export interface IDocument {
   fileUrl: string;
   previewUrl: string;
   downloadUrl: string;
+  url: string;
 
   owner: IDocumentOwner;
 

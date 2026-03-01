@@ -2,23 +2,22 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/libs/utils";
 
 type Props = {
-  stockUnits: number;
-  lowStockAlert?: number;
+  label: string;
+  variant: "success" | "destructive" | "secondary";
 };
 
-export function StockBadge({ stockUnits, lowStockAlert = 10 }: Props) {
-  const isLowStock = stockUnits <= lowStockAlert;
-
+export function StockBadge({ label, variant }: Props) {
   return (
     <Badge
       className={cn(
         "absolute top-2 right-2",
-        isLowStock
-          ? "!bg-destructive text-destructive-foreground"
-          : "!bg-success text-success-foreground",
+        variant === "destructive" &&
+          "!bg-destructive text-destructive-foreground",
+        variant === "success" && "!bg-success text-success-foreground",
+        variant === "secondary" && "!bg-secondary text-secondary-foreground",
       )}
     >
-      {isLowStock ? "LOW STOCK" : "IN STOCK"}
+      {label}
     </Badge>
   );
 }

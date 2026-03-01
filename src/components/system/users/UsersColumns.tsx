@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Pencil, Trash2 } from "lucide-react";
 import { cn } from "@/libs/utils";
 import type { Column } from "@/components/common/DataTable";
+import { EUserRole, EUserStatus } from "@/enums/user.enums";
 
 type Handlers = {
   onEdit: (u: IUser) => void;
@@ -33,9 +34,9 @@ export const userColumns = ({
     header: "ROLE",
     render: (user: IUser) => (
       <Badge
-        variant={user.role === "SUPER_ADMIN" ? "default" : "secondary"}
+        variant={user.role === EUserRole.SUPER_ADMIN ? "default" : "secondary"}
         className={cn(
-          user.role === "SUPER_ADMIN" && "bg-primary/10 text-primary",
+          user.role === EUserRole.SUPER_ADMIN && "bg-primary/10 text-primary",
         )}
       >
         {user.role.replace("_", " ")}
@@ -49,16 +50,20 @@ export const userColumns = ({
         <div
           className={cn(
             "w-2 h-2 rounded-full",
-            user.status === "ACTIVE" ? "bg-success" : "bg-muted-foreground",
+            user.status === EUserStatus.ACTIVE
+              ? "bg-success"
+              : "bg-muted-foreground",
           )}
         />
         <span
           className={cn(
             "text-sm",
-            user.status === "ACTIVE" ? "text-success" : "text-muted-foreground",
+            user.status === EUserStatus.ACTIVE
+              ? "text-success"
+              : "text-muted-foreground",
           )}
         >
-          {user.status === "ACTIVE" ? "Active" : "Inactive"}
+          {user.status === EUserStatus.ACTIVE ? "Active" : "Inactive"}
         </span>
       </div>
     ),
@@ -77,7 +82,7 @@ export const userColumns = ({
           <Pencil className="h-4 w-4" />
         </Button>
 
-        {user.role !== "SUPER_ADMIN" && (
+        {user.role !== EUserRole.SUPER_ADMIN && (
           <Button
             variant="ghost"
             size="icon"

@@ -14,13 +14,14 @@ import { IUser } from "@/types/user";
 import { FormCard } from "@/components/common/FormCard";
 import { FormField } from "@/components/common/FormField";
 import { FormActions } from "@/components/common/FormActions";
+import { EUserRole, EUserStatus } from "@/enums/user.enums";
 
 type FormData = {
   fullName: string;
   email: string;
   password: string;
-  role: "ADMIN" | "SUPER_ADMIN";
-  status: "ACTIVE" | "INACTIVE";
+  role: EUserRole;
+  status: EUserStatus;
 };
 
 type FormErrors = Partial<Record<keyof FormData, string>>;
@@ -30,7 +31,7 @@ type Props = {
   formData: FormData;
   onChange: (data: FormData) => void;
   onSubmit: () => void;
-  onCancel: () => void;
+  onClose: () => void;
 };
 
 export function UserForm({
@@ -38,10 +39,10 @@ export function UserForm({
   formData,
   onChange,
   onSubmit,
-  onCancel,
+  onClose,
 }: Props) {
   const [errors, setErrors] = useState<FormErrors>({});
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const validate = (): boolean => {
     const nextErrors: FormErrors = {};
@@ -60,12 +61,24 @@ export function UserForm({
       nextErrors.password = "Password is required";
     }
 
-    if (formData.password && formData.password.length < 6) {
-      nextErrors.password = "Password must be at least 6 characters";
+    if (formData.password && formData.password.length < 8) {
+      nextErrors.password = "Password must be at least 8 characters";
     }
 
     setErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
+  };
+
+  const handleSubmit = () => {
+    if (validate()) {
+      onSubmit();
+    }
+  };
+
+  const handleClose = () => {
+    setErrors({});
+    setShowPassword(false);
+    onClose();
   };
 
   const autoGeneratePassword = () => {
@@ -80,10 +93,8 @@ export function UserForm({
       icon={<LucideKey className="h-6 w-6" />}
       title={editingUser ? "Edit User" : "Create New User"}
       submitLabel={editingUser ? "Update User" : "Register User"}
-      onClose={onCancel}
-      onSubmit={() => {
-        if (validate()) onSubmit();
-      }}
+      onClose={handleClose}
+      onSubmit={handleSubmit}
     >
       <FormField label="Full Name" error={errors.fullName}>
         <Input
@@ -105,7 +116,11 @@ export function UserForm({
           className="rounded-xl h-11"
           onChange={(e) => {
             onChange({ ...formData, email: e.target.value });
-            setErrors((er) => ({ ...er, email: undefined }));
+            setErrors((er) => {
+              const newErrors = { ...er };
+              delete newErrors.email; // ✅ fixed
+              return newErrors;
+            });
           }}
         />
       </FormField>
@@ -148,9 +163,7 @@ export function UserForm({
         <FormField label="Role">
           <Select
             value={formData.role}
-            onValueChange={(v: "ADMIN" | "SUPER_ADMIN") =>
-              onChange({ ...formData, role: v })
-            }
+            onValueChange={(v: EUserRole) => onChange({ ...formData, role: v })}
           >
             <SelectTrigger className="rounded-xl h-11">
               <SelectValue />
@@ -165,7 +178,7 @@ export function UserForm({
         <FormField label="Status">
           <Select
             value={formData.status}
-            onValueChange={(v: "ACTIVE" | "INACTIVE") =>
+            onValueChange={(v: EUserStatus) =>
               onChange({ ...formData, status: v })
             }
           >
@@ -182,10 +195,10 @@ export function UserForm({
 
       <FormActions
         submitText={editingUser ? "Update User" : "Register User"}
-        isDisabled={Object.keys(errors).length > 0}
-        onCancel={onCancel}
+        isDisabled={!!Object.values(errors).some((e) => e)}
+        onCancel={handleClose}
         CancelText="Discard"
-        onSubmit={onSubmit}
+        onSubmit={handleSubmit}
       />
     </FormCard>
   );

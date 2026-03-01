@@ -2,31 +2,49 @@ import instance from "@/libs/axios";
 import {
   ILoginDto,
   IRefreshTokenDto,
-  TLoginResponse,
-  IApiResponse,
   IAuthUser,
   IAuthData,
-} from "@/types/auth";
+  IApiResponse,
+} from "@/types";
+import { throwServiceError } from "@/utils/errorServiceHelper";
+import { EAuthApi } from "@/enums/service.enums";
 
-export const loginService = async (data: ILoginDto): Promise<IAuthData> => {
-  return instance.post<IAuthData, IAuthData>("/api/auth/login", data);
+export const loginService = async (
+  data: ILoginDto,
+): Promise<IApiResponse<IAuthData>> => {
+  try {
+    const { data: response } = await instance.post(EAuthApi.LOGIN, data);
+    return response;
+  } catch (error) {
+    return throwServiceError(error);
+  }
 };
 
 export const refreshTokenService = async (
   data: IRefreshTokenDto,
-): Promise<TLoginResponse> => {
-  const res = await instance.post<TLoginResponse>("/api/auth/refresh", data);
-  return res.data;
+): Promise<IApiResponse<IAuthData>> => {
+  try {
+    const { data: response } = await instance.post(EAuthApi.REFRESH, data);
+    return response;
+  } catch (error) {
+    return throwServiceError(error);
+  }
 };
 
 export const getMeService = async (): Promise<IApiResponse<IAuthUser>> => {
-  return instance.get<IApiResponse<IAuthUser>, IApiResponse<IAuthUser>>(
-    "/api/auth/me",
-  );
+  try {
+    const { data: response } = await instance.get(EAuthApi.ME);
+    return response;
+  } catch (error) {
+    return throwServiceError(error);
+  }
 };
 
 export const logoutService = async (): Promise<IApiResponse<null>> => {
-  return instance.post<IApiResponse<null>, IApiResponse<null>>(
-    "/api/auth/logout",
-  );
+  try {
+    const { data: response } = await instance.post(EAuthApi.LOGOUT);
+    return response;
+  } catch (error) {
+    return throwServiceError(error);
+  }
 };

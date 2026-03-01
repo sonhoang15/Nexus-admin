@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 export const useConfirmDelete = () => {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState<boolean>(false);
   const [onConfirm, setOnConfirm] = useState<() => void>(() => {});
 
   const confirm = (callback: () => void) => {
