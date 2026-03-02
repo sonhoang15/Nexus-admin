@@ -5,6 +5,7 @@ import SignInForm from "@/components/auth/Login";
 import SignUpForm from "@/components/auth/Register";
 import { Button } from "@/components/ui/button";
 import { UserContext } from "@/context/UserContext";
+import { ERoutePath } from "@/enums/route.enums";
 
 export default function AuthForm() {
   const [isRegister, setIsRegister] = useState<boolean>(false);
@@ -13,7 +14,7 @@ export default function AuthForm() {
 
   useEffect(() => {
     if (ctx?.isAuthenticated) {
-      navigate("/", { replace: true });
+      navigate(ERoutePath.DASHBOARD, { replace: true });
     }
   }, [ctx?.isAuthenticated]);
   return (
