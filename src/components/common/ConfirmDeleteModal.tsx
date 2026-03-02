@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { createPortal } from "react-dom";
 
 type Props = {
   open: boolean;
@@ -34,31 +35,28 @@ export function ConfirmDeleteModal({
       itemName ? ` "${itemName}"` : ""
     }? This action cannot be undone.`;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-lg">
-        <h2 className="text-lg font-semibold text-gray-900">{finalTitle}</h2>
+  return createPortal(
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+      <div className="w-full max-w-2xl rounded-2xl bg-white p-8 shadow-2xl">
+        <h2 className="text-2xl font-semibold text-gray-900">{finalTitle}</h2>
 
-        <p className="mt-2 text-sm text-gray-600">{finalDescription}</p>
+        <p className="mt-4 text-base text-gray-600">{finalDescription}</p>
 
-        <div className="mt-6 flex justify-end gap-3">
-          <Button
-            onClick={onCancel}
-            disabled={loading}
-            className="rounded-lg border px-4 py-2 text-sm"
-          >
+        <div className="mt-8 flex justify-end gap-4">
+          <Button onClick={onCancel} disabled={loading} className="px-6 py-2">
             {cancelText}
           </Button>
 
           <Button
             onClick={onConfirm}
             disabled={loading}
-            className="rounded-lg bg-red-600 px-4 py-2 text-sm text-white hover:bg-red-700"
+            className="bg-red-600 px-6 py-2 text-white hover:bg-red-700"
           >
             {loading ? "Deleting..." : confirmText}
           </Button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
