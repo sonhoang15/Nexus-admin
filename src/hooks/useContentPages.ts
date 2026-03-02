@@ -5,7 +5,7 @@ import {
   createPageService,
   updatePageService,
   deletePageService,
-} from "@/services/PagesService";
+} from "@/services/pages.Service";
 import { IPage, TPageStatus } from "@/types";
 
 type ViewMode = "table" | "form";

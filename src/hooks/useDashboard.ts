@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import dashboardService from "@/services/DashboardService";
+import dashboardService from "@/services/dashboard.Service";
 import {
   IDashboardStats,
   IDashboardGrowth,

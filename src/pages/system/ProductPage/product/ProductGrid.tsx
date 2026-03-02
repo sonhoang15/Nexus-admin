@@ -1,5 +1,5 @@
 import { IProduct } from "@/types/product";
-import { ProductCard } from "@/components/system/products/ProductCard";
+import { ProductCard } from "@/pages/system/ProductPage/product/ProductCard";
 
 type Props = {
   products: IProduct[];

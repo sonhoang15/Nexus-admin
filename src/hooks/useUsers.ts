@@ -5,7 +5,7 @@ import {
   createUserService,
   updateUserService,
   deleteUserService,
-} from "@/services/UsersService";
+} from "@/services/users.Service";
 import { toast } from "sonner";
 import { EUserRole, EUserStatus } from "@/enums/user.enums";
 

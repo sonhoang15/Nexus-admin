@@ -1,4 +1,4 @@
-import { ImageItem } from "@/components/system/products/steps/MediaStep";
+import { ImageItem } from "@/pages/system/ProductPage/product/steps/MediaStep";
 import { EStatus, EPromotion, ESort } from "@/enums/filters.enums";
 
 export type TProductFilters = {

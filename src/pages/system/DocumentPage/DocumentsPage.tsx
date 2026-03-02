@@ -1,9 +1,10 @@
-import { DocumentsHeader } from "@/components/system/documents/DocumentsHeader";
-import { DocumentsTable } from "@/components/system/documents/DocumentsTable";
-import { UploadDocumentForm } from "@/components/system/documents/UploadDocumentForm";
+import { DocumentsHeader } from "@/pages/system/DocumentPage/documents/DocumentsHeader";
+import { DocumentsTable } from "@/pages/system/DocumentPage/documents/DocumentsTable";
+import { UploadDocumentForm } from "@/pages/system/DocumentPage/documents/UploadDocumentForm";
 import { useDocuments } from "@/hooks/useDocuments";
-import DocumentPreviewModal from "@/components/system/documents/DocumentPreviewModal";
+import DocumentPreviewModal from "@/pages/system/DocumentPage/documents/DocumentPreviewModal";
 import { ConfirmDeleteModal } from "@/components/common/ConfirmDeleteModal";
+import { Loading } from "@/components/common/Loading";
 
 export default function DocumentsPage() {
   const {
@@ -13,6 +14,7 @@ export default function DocumentsPage() {
     deleteDocumentId,
     isDeleting,
     selectedDocument,
+    documentsLoading,
     setFormData,
     handleUpload,
     handleDelete,
@@ -28,14 +30,23 @@ export default function DocumentsPage() {
   return (
     <div className="space-y-6">
       <DocumentsHeader onUpload={handleUpload} />
-
       {viewMode === "table" && (
-        <DocumentsTable
-          documents={documents}
-          onDelete={handleDelete}
-          onView={handleView}
-          onDownload={handleDownload}
-        />
+        <>
+          {documentsLoading ? (
+            <Loading />
+          ) : documents.length === 0 ? (
+            <div className="text-center py-10 text-gray-500">
+              No documents found.
+            </div>
+          ) : (
+            <DocumentsTable
+              documents={documents}
+              onDelete={handleDelete}
+              onView={handleView}
+              onDownload={handleDownload}
+            />
+          )}
+        </>
       )}
 
       {viewMode === "form" && (

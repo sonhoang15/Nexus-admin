@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getCategoriesService } from "@/services/CategoriesService";
+import { getCategoriesService } from "@/services/categories.Service";
 import { ICategory } from "@/types/category";
 
 export const useCategoryOptions = () => {

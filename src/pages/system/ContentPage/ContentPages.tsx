@@ -1,7 +1,7 @@
-import { ContentsTable } from "@/components/system/contents/ContentsTable";
-import { ContentsEditor } from "@/components/system/contents/ContentsForm";
-import { ContentPagesHeader } from "@/components/system/contents/ContentPagesHeader";
-import { ContentToolbar } from "@/components/system/contents/ContentToolbar";
+import { ContentsTable } from "@/pages/system/ContentPage/contents/ContentsTable";
+import { ContentsEditor } from "@/pages/system/ContentPage/contents/ContentsForm";
+import { ContentPagesHeader } from "@/pages/system/ContentPage/contents/ContentPagesHeader";
+import { ContentToolbar } from "@/pages/system/ContentPage/contents/ContentToolbar";
 import { useContentPages } from "@/hooks/useContentPages";
 import { ConfirmDeleteModal } from "@/components/common/ConfirmDeleteModal";
 
