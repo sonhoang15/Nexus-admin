@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getProductById, deleteProduct } from "@/services/ProductsService";
+import { getProductById, deleteProduct } from "@/services/products.Service";
 import { IProduct } from "@/types/product";
 import { Button } from "@/components/ui/button";
 import {

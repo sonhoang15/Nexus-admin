@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { documentService } from "@/services/DocumentService";
+import { documentService } from "@/services/document.Service";
 import { IDocument } from "@/types";
 
 type ViewMode = "table" | "form" | "preview";
@@ -34,6 +34,7 @@ export function useDocuments() {
 
   const [deleteDocumentId, setDeleteDocumentId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
+  const [documentsLoading, setDocumentsLoading] = useState<boolean>(false);
 
   const formatSize = (bytes: number) => {
     if (!bytes) return "0 B";
@@ -83,16 +84,17 @@ export function useDocuments() {
 
   const fetchDocuments = async () => {
     try {
-      setLoading(true);
+      setDocumentsLoading(true);
       setError(null);
 
       const res = await documentService.getAll();
       setDocuments(res.map(mapToDocument));
     } catch (err) {
       console.error("Failed to fetch documents:", err);
+      setDocuments([]);
       setError("Failed to load documents");
     } finally {
-      setLoading(false);
+      setDocumentsLoading(false);
     }
   };
 
@@ -211,6 +213,9 @@ export function useDocuments() {
     formData,
     error,
     selectedDocument,
+    documentsLoading,
+    deleteDocumentId,
+    isDeleting,
     setFormData,
 
     handleUpload,
@@ -218,8 +223,6 @@ export function useDocuments() {
     handleClose,
     handleDelete,
 
-    deleteDocumentId,
-    isDeleting,
     confirmDelete,
     cancelDelete,
 

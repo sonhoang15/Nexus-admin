@@ -1,7 +1,7 @@
 import { PageHeader } from "@/components/common/PageHeader";
 import { ListToolbar } from "@/components/common/ListToolbar";
-import { userColumns } from "@/components/system/users/UsersColumns";
-import { UserForm } from "@/components/system/users/UserForm";
+import { userColumns } from "@/pages/system/UsersPage/users/UsersColumns";
+import { UserForm } from "@/pages/system/UsersPage/users/UserForm";
 import { useUsers } from "@/hooks/useUsers";
 import { ConfirmDeleteModal } from "@/components/common/ConfirmDeleteModal";
 import { DataTable } from "@/components/common/DataTable";

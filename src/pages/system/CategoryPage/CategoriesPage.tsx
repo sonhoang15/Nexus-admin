@@ -5,6 +5,7 @@ import { CategoryForm } from "@/components/system/categories/CategoryForm";
 import { categoryColumns } from "@/components/system/categories/Category.columns";
 import { useCategories } from "@/hooks/useCategories";
 import { ConfirmDeleteModal } from "@/components/common/ConfirmDeleteModal";
+import { Loading } from "@/components/common/Loading";
 
 const CategoriesPage = () => {
   const {
@@ -15,6 +16,7 @@ const CategoriesPage = () => {
     formData,
     deleteCategoryId,
     isDeleting,
+    categoriesLoading,
 
     setSearch,
     setFormData,
@@ -55,13 +57,23 @@ const CategoriesPage = () => {
       )}
 
       {viewMode === "form" && (
-        <CategoryForm
-          editingCategory={editingCategory}
-          formData={formData}
-          onChange={setFormData}
-          onClose={handleCancel}
-          onSubmit={handleSubmit}
-        />
+        <>
+          {categoriesLoading ? (
+            <Loading />
+          ) : categories.length === 0 ? (
+            <div className="text-center py-10 text-gray-500">
+              No categories found.
+            </div>
+          ) : (
+            <CategoryForm
+              editingCategory={editingCategory}
+              formData={formData}
+              onChange={setFormData}
+              onClose={handleCancel}
+              onSubmit={handleSubmit}
+            />
+          )}
+        </>
       )}
       <ConfirmDeleteModal
         open={!!deleteCategoryId}

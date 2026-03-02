@@ -2,13 +2,13 @@ import { useState } from "react";
 import { FormActions } from "@/components/common/FormActions";
 import { useCategoryOptions } from "@/hooks/useCategoryOptions";
 import { ProductFormSidebar } from "./ProductFormSidebar";
-import { GeneralStep } from "@/components/system/products/steps/GeneralStep";
-import { PricingStep } from "@/components/system/products/steps/PricingStep";
+import { GeneralStep } from "@/pages/system/ProductPage/product/steps/GeneralStep";
+import { PricingStep } from "@/pages/system/ProductPage/product/steps/PricingStep";
 import {
   TImageItem,
   MediaStep,
-} from "@/components/system/products/steps/MediaStep";
-import { SeoStep } from "@/components/system/products/steps/SeoStep";
+} from "@/pages/system/ProductPage/product/steps/MediaStep";
+import { SeoStep } from "@/pages/system/ProductPage/product/steps/SeoStep";
 import { Package } from "lucide-react";
 import { useMemo } from "react";
 import { TProductFormData } from "@/types/product";

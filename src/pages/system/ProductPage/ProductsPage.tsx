@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { useProducts } from "@/hooks/useProducts";
-import { ProductToolbar } from "@/components/system/products/ProductToolbar";
-import { ProductCard } from "@/components/system/products/ProductCard";
-import { ProductForm } from "@/components/system/products/ProductForm";
-import { ProductDetail } from "@/components/system/products/ProductDetail";
-import { ProductFilters } from "@/components/system/products/ProductFilter";
+import { ProductToolbar } from "@/pages/system/ProductPage/product/ProductToolbar";
+import { ProductCard } from "@/pages/system/ProductPage/product/ProductCard";
+import { ProductForm } from "@/pages/system/ProductPage/product/ProductForm";
+import { ProductDetail } from "@/pages/system/ProductPage/product/ProductDetail";
+import { ProductFilters } from "@/pages/system/ProductPage/product/ProductFilter";
 import { useCategoryOptions } from "@/hooks/useCategoryOptions";
 import { PageHeader } from "@/components/common/PageHeader";
 import { ConfirmDeleteModal } from "@/components/common/ConfirmDeleteModal";
+import { Loading } from "@/components/common/Loading";
 
 const ProductsPage = () => {
   const {
@@ -21,6 +22,7 @@ const ProductsPage = () => {
     tagInput,
     deleteProductId,
     isDeleting,
+    productsLoading,
     setFilters,
     setSearch,
     setFormData,
@@ -67,17 +69,27 @@ const ProductsPage = () => {
       )}
 
       {viewMode === "table" && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {products.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              onView={handleView}
-              onEdit={handleEdit}
-              onDelete={(p) => handleDelete(p.id)}
-            />
-          ))}
-        </div>
+        <>
+          {productsLoading ? (
+            <Loading />
+          ) : products.length === 0 ? (
+            <div className="text-center py-10 text-gray-500">
+              No products found.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {products.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  onView={handleView}
+                  onEdit={handleEdit}
+                  onDelete={(p) => handleDelete(p.id)}
+                />
+              ))}
+            </div>
+          )}
+        </>
       )}
 
       {viewMode === "form" && (

@@ -1,14 +1,14 @@
 import { Routes, Route } from "react-router-dom";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 
-import Dashboard from "@/pages/system/Dashboard";
-import UsersPage from "@/pages/system/UsersPage";
-import CategoriesPage from "@/pages/system/CategoriesPage";
-import ProductsPage from "@/pages/system/ProductsPage";
-import DocumentsPage from "@/pages/system/DocumentsPage";
-import ContentPagesPage from "@/pages/system/ContentPages";
-import SettingsPage from "@/pages/system/SettingsPage";
-import AuthPage from "@/pages/auth/AuthPage";
+import Dashboard from "@/pages/system/Dashbroard/Dashboard";
+import UsersPage from "@/pages/system/UsersPage/UsersPage";
+import CategoriesPage from "@/pages/system/CategoryPage/CategoriesPage";
+import ProductsPage from "@/pages/system/ProductPage/ProductsPage";
+import DocumentsPage from "@/pages/system/DocumentPage/DocumentsPage";
+import ContentPagesPage from "@/pages/system/ContentPage/ContentPages";
+import SettingsPage from "@/pages/system/SettingPage/SettingsPage";
+import AuthPage from "@/pages/authPage/AuthPage";
 import NotFound from "@/pages/system/NotFound";
 import ProtectedRoute from "@/routes/ProtectedRoute";
 

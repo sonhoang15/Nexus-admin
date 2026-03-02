@@ -1,8 +1,8 @@
 import { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import clsx from "clsx";
-import SignInForm from "@/components/auth/Login";
-import SignUpForm from "@/components/auth/Register";
+import SignInForm from "@/pages/authPage/auth/Login";
+import SignUpForm from "@/pages/authPage/auth/Register";
 import { Button } from "@/components/ui/button";
 import { UserContext } from "@/context/UserContext";
 import { ERoutePath } from "@/enums/route.enums";

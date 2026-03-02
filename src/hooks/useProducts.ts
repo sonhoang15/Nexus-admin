@@ -8,7 +8,7 @@ import {
   getProductById,
   uploadProductImages,
   deleteProductImage,
-} from "@/services/ProductsService";
+} from "@/services/products.Service";
 import { DEFAULT_PRODUCT_FORM } from "@/constants/productDefaults";
 import { TProductFormData } from "@/types/product";
 import { EStatus, EPromotion, ESort } from "@/enums/filters.enums";
@@ -46,17 +46,26 @@ export function useProducts() {
   const [deleteProductId, setDeleteProductId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
+  const [productsLoading, setProductsLoading] = useState(true);
+
   useEffect(() => {
     const fetchProducts = async () => {
-      const data = await getProducts();
-      setProducts(
-        data?.items?.map((p) => ({
-          ...p,
-          basePrice: Number(p.basePrice),
-          discountPrice: p.discountPrice ? Number(p.discountPrice) : undefined,
-          tags: p.tags ?? [],
-        })) || [],
-      );
+      try {
+        const data = await getProducts();
+        setProducts(
+          data?.items?.map((p) => ({
+            ...p,
+            basePrice: Number(p.basePrice),
+            discountPrice: p.discountPrice
+              ? Number(p.discountPrice)
+              : undefined,
+            tags: p.tags ?? [],
+          })) || [],
+        );
+        setProductsLoading(false);
+      } catch (error) {
+        setProductsLoading(false);
+      }
     };
 
     fetchProducts();
@@ -358,6 +367,7 @@ export function useProducts() {
     errors,
     deleteProductId,
     isDeleting,
+    productsLoading,
 
     setSearch,
     setFilters,

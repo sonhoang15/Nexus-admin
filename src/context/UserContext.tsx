@@ -1,9 +1,9 @@
 import { createContext, useEffect, useState } from "react";
-import { loginService } from "@/services/AuthService";
+import { loginService } from "@/services/auth.Service";
 import { storage } from "@/utils/storageHelper";
 import { IAuthData } from "@/types/auth";
-import { logoutService } from "@/services/AuthService";
-import { getMeService } from "@/services/AuthService";
+import { logoutService } from "@/services/auth.Service";
+import { getMeService } from "@/services/auth.Service";
 
 interface LoginResult {
   message: string;

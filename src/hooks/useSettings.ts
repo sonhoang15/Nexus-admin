@@ -4,7 +4,7 @@ import {
   createSettingService,
   updateSettingService,
   deleteSettingService,
-} from "@/services/SettingService";
+} from "@/services/setting.Service";
 import { ISetting, CreateSettingDto, IUpdateSettingDto } from "@/types";
 
 type ViewMode = "table" | "form";

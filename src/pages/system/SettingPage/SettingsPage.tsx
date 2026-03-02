@@ -1,7 +1,7 @@
 import { useSettings } from "@/hooks/useSettings";
-import { SettingsSearchBar } from "@/components/system/settings/SettingsSearchBar";
-import { SettingsTable } from "@/components/system/settings/SettingsTable";
-import { SettingsForm } from "@/components/system/settings/SettingsForm";
+import { SettingsSearchBar } from "@/pages/system/SettingPage/settings/SettingsSearchBar";
+import { SettingsTable } from "@/pages/system/SettingPage/settings/SettingsTable";
+import { SettingsForm } from "@/pages/system/SettingPage/settings/SettingsForm";
 import { ConfirmDeleteModal } from "@/components/common/ConfirmDeleteModal";
 
 export default function SettingsPage() {

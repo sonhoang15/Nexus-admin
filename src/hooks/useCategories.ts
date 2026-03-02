@@ -4,7 +4,7 @@ import {
   createCategoryService,
   updateCategoryService,
   deleteCategoryService,
-} from "@/services/CategoriesService";
+} from "@/services/categories.Service";
 import { ICategory } from "@/types/category";
 import { toast } from "sonner";
 
@@ -14,12 +14,12 @@ export const useCategories = () => {
   const [categories, setCategories] = useState<ICategory[]>([]);
   const [search, setSearch] = useState<string>("");
   const [viewMode, setViewMode] = useState<ViewMode>("table");
-  const [loading, setLoading] = useState<boolean>(false);
   const [editingCategory, setEditingCategory] = useState<ICategory | null>(
     null,
   );
   const [deleteCategoryId, setDeleteCategoryId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
+  const [categoriesLoading, setCategoriesLoading] = useState<boolean>(false);
 
   const [formData, setFormData] = useState<{
     name: string;
@@ -31,13 +31,13 @@ export const useCategories = () => {
 
   const fetchCategories = async () => {
     try {
-      setLoading(true);
+      setCategoriesLoading(true);
       const data = await getCategoriesService();
       setCategories(data);
     } catch (error) {
       console.error("Fetch categories failed:", error);
     } finally {
-      setLoading(false);
+      setCategoriesLoading(false);
     }
   };
 
@@ -135,9 +135,9 @@ export const useCategories = () => {
     viewMode,
     editingCategory,
     formData,
-    loading,
     isDeleting,
     deleteCategoryId,
+    categoriesLoading,
 
     setSearch,
     setFormData,

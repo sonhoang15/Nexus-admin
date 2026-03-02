@@ -1,4 +1,4 @@
-import { StockBadge } from "@/components/system/products/StockBadge";
+import { StockBadge } from "@/pages/system/ProductPage/product/StockBadge";
 import { Card, CardContent } from "@/components/ui/card";
 import { IProduct } from "@/types/product";
 import { Button } from "@/components/ui/button";
