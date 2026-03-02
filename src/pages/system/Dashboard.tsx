@@ -6,6 +6,7 @@ import { CategorySplitChart } from "@/components/system/dashboard/CategorySplitC
 import { LatestProducts } from "@/components/system/dashboard/LatestProducts";
 import { ContentStatus } from "@/components/system/dashboard/ContentStatus";
 import { useDashboard } from "@/hooks/useDashboard";
+import { ERoutePath } from "@/enums/route.enums";
 
 const CATEGORY_COLORS = ["#6366f1", "#f59e0b", "#10b981", "#ef4444", "#8b5cf6"];
 
@@ -88,11 +89,11 @@ export default function Dashboard() {
       <div className="grid gap-4 lg:grid-cols-2">
         <LatestProducts
           products={mappedProducts}
-          onViewAll={() => navigate("/products")}
+          onViewAll={() => navigate(ERoutePath.PRODUCTS)}
         />
         <ContentStatus
           pages={contentStatus}
-          onNewPage={() => navigate("/pages")}
+          onNewPage={() => navigate(ERoutePath.PAGES)}
         />
       </div>
     </div>

@@ -12,26 +12,26 @@ import AuthPage from "@/pages/auth/AuthPage";
 import NotFound from "@/pages/system/NotFound";
 import ProtectedRoute from "@/routes/ProtectedRoute";
 
+import { ERoutePath } from "@/enums/route.enums";
+
 const AppRoutes = () => {
   return (
-    <>
-      <Routes>
-        <Route path="/auth" element={<AuthPage />} />
+    <Routes>
+      <Route path={ERoutePath.AUTH} element={<AuthPage />} />
 
-        <Route element={<ProtectedRoute />}>
-          <Route element={<AdminLayout />}>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/users" element={<UsersPage />} />
-            <Route path="/categories" element={<CategoriesPage />} />
-            <Route path="/products" element={<ProductsPage />} />
-            <Route path="/documents" element={<DocumentsPage />} />
-            <Route path="/pages" element={<ContentPagesPage />} />
-            <Route path="/settings" element={<SettingsPage />} />
-            <Route path="*" element={<NotFound />} />
-          </Route>
+      <Route element={<ProtectedRoute />}>
+        <Route element={<AdminLayout />}>
+          <Route path={ERoutePath.DASHBOARD} element={<Dashboard />} />
+          <Route path={ERoutePath.USERS} element={<UsersPage />} />
+          <Route path={ERoutePath.CATEGORIES} element={<CategoriesPage />} />
+          <Route path={ERoutePath.PRODUCTS} element={<ProductsPage />} />
+          <Route path={ERoutePath.DOCUMENTS} element={<DocumentsPage />} />
+          <Route path={ERoutePath.PAGES} element={<ContentPagesPage />} />
+          <Route path={ERoutePath.SETTINGS} element={<SettingsPage />} />
+          <Route path={ERoutePath.NOT_FOUND} element={<NotFound />} />
         </Route>
-      </Routes>
-    </>
+      </Route>
+    </Routes>
   );
 };
 
